@@ -36,7 +36,9 @@ class FormController {
 
   async getAllForms(req, res) {
     try {
-      const forms = await formService.getAllForms();
+      const limit = req.query.limit;
+      const page = req.query.page;
+      const forms = await formService.getAllForms({ limit, page });
       return res.status(200).json(forms);
     } catch (error) {
       return res.status(500).json({ message: error.message });

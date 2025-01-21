@@ -22,12 +22,21 @@ class FormService {
     }
   }
 
-  async getAllForms() {
+  async getAllForms({ page = 1, limit = 10 }) {
     try {
-      const forms = await Form.findAll({
+      const offset = (page - 1) * limit;
+
+      const { rows: forms, count: total } = await Form.findAndCountAll({
         include: [{ model: Park, attributes: ["title", "id"] }],
+        limit,
+        offset,
       });
-      return forms;
+      return {
+        forms,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+      };
     } catch (error) {
       throw new Error(`Ошибка при получении списка форм: ${error.message}`);
     }
