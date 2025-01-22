@@ -30,7 +30,14 @@ class ParkController {
     try {
       const limit = req.query.limit;
       const page = req.query.page;
-      const parks = await parkService.getAllParks({ limit, page });
+      const sortOrder = req.query.sortOrder;
+      const sortField = req.query.sortField;
+      const parks = await parkService.getAllParks({
+        limit,
+        page,
+        sortField,
+        sortOrder,
+      });
       return res.status(200).json(parks);
     } catch (error) {
       return res.status(500).json({ message: error.message });
