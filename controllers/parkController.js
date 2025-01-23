@@ -10,7 +10,7 @@ class ParkController {
           .json({ message: "Название и идентификатор города обязательны." });
       }
       const park = await parkService.createPark(data);
-      return res.status(201).json(park);
+      return res.status(200).json(park);
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
