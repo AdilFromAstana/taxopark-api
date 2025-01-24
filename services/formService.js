@@ -22,14 +22,33 @@ class FormService {
     }
   }
 
-  async getAllForms({ page = 1, limit = 10 }) {
+  async getAllForms({
+    page = 1,
+    limit = 10,
+    sortField = null,
+    sortOrder = null,
+  }) {
     try {
       const offset = (page - 1) * limit;
 
+      const validSortOrder = ["asc", "desc"].includes(sortOrder)
+        ? sortOrder
+        : null;
+
+      let order = [];
+      if (sortField && validSortOrder) {
+        if (sortField === "Park") {
+          order.push([{ model: Park, as: "Park" }, "title", validSortOrder]);
+        } else {
+          order.push([sortField, validSortOrder]);
+        }
+      }
+
       const { rows: forms, count: total } = await Form.findAndCountAll({
-        include: [{ model: Park, attributes: ["title", "id"] }],
+        include: [{ model: Park, as: "Park", attributes: ["title", "id"] }],
         limit,
         offset,
+        order,
       });
       return {
         forms,

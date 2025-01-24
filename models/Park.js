@@ -15,7 +15,11 @@ const Park = sequelize.define("Park", {
   accountantSupport: { type: DataTypes.BOOLEAN, allowNull: true },
   yandexGasStation: { type: DataTypes.BOOLEAN, allowNull: true },
   supportWorkTime: { type: DataTypes.STRING, allowNull: true },
-  parkCommission: { type: DataTypes.DECIMAL, allowNull: true },
+  parkCommission: {
+    type: DataTypes.DECIMAL,
+    allowNull: false,
+    defaultValue: 0,
+  },
   parkPromotions: {
     type: DataTypes.ARRAY(DataTypes.INTEGER),
     allowNull: true,
@@ -36,10 +40,10 @@ const Park = sequelize.define("Park", {
   title: { type: DataTypes.STRING, allowNull: false },
   averageCheck: {
     type: DataTypes.INTEGER,
-    allowNull: false, // Поле обязательно
-    defaultValue: 0, // Значение по умолчанию
+    allowNull: false,
+    defaultValue: 0,
     validate: {
-      min: 0, // Средний чек не может быть меньше 0
+      min: 0,
     },
   },
 });

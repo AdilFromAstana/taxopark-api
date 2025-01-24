@@ -38,7 +38,14 @@ class FormController {
     try {
       const limit = req.query.limit;
       const page = req.query.page;
-      const forms = await formService.getAllForms({ limit, page });
+      const sortOrder = req.query.sortOrder;
+      const sortField = req.query.sortField;
+      const forms = await formService.getAllForms({
+        limit,
+        page,
+        sortField,
+        sortOrder,
+      });
       return res.status(200).json(forms);
     } catch (error) {
       return res.status(500).json({ message: error.message });
