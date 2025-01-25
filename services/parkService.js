@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { Park, City } = require("../models/index");
 
 class ParkService {
@@ -27,6 +28,8 @@ class ParkService {
     limit = 10,
     sortField = null,
     sortOrder = null,
+    cityId = null,
+    parkPromotions = [],
   }) {
     try {
       const offset = (page - 1) * limit;
@@ -44,6 +47,18 @@ class ParkService {
         }
       }
 
+      const where = {};
+
+      if (cityId && cityId !== "null") {
+        where.cityId = cityId;
+      }
+
+      if (Array.isArray(parkPromotions) && parkPromotions.length > 0) {
+        where.parkPromotions = {
+          [Op.contains]: parkPromotions,
+        };
+      }
+
       const { rows: parks, count: total } = await Park.findAndCountAll({
         include: [
           {
@@ -52,6 +67,7 @@ class ParkService {
             attributes: ["title", "id"],
           },
         ],
+        where,
         limit,
         offset,
         order,
@@ -67,6 +83,8 @@ class ParkService {
       throw new Error(`Ошибка при получении списка парков: ${error.message}`);
     }
   }
+
+
 
   async updatePark(id, data) {
     try {

@@ -1,11 +1,12 @@
+const { UUID } = require("sequelize");
 const formService = require("../services/formService");
 
 class FormController {
   async createForm(req, res) {
     try {
-      const { name, parkId, formType, phoneNumber } = req.body;
+      const { name, parkId, formType, phoneNumber, selectedParks } = req.body;
 
-      if (!name || !parkId || !formType || !phoneNumber) {
+      if (!name || !formType || !phoneNumber) {
         return res.status(400).json({
           message:
             "Все поля (name, parkId, formType, phoneNumber) обязательны.",
@@ -17,6 +18,7 @@ class FormController {
         parkId,
         formType,
         phoneNumber,
+        selectedParks
       });
       return res.status(201).json(form);
     } catch (error) {
@@ -40,11 +42,18 @@ class FormController {
       const page = req.query.page;
       const sortOrder = req.query.sortOrder;
       const sortField = req.query.sortField;
+      const nameFilter = req.query.nameFilter;
+      const selectedParks = req.query.selectedParks
+        ? req.query.selectedParks.split(",").map(v => v)
+        : [];
+
       const forms = await formService.getAllForms({
         limit,
         page,
         sortField,
         sortOrder,
+        selectedParks,
+        nameFilter
       });
       return res.status(200).json(forms);
     } catch (error) {

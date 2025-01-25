@@ -1,3 +1,4 @@
+const { Op, Sequelize } = require("sequelize");
 const { Park, Form } = require("../models/index");
 
 class FormService {
@@ -27,6 +28,8 @@ class FormService {
     limit = 10,
     sortField = null,
     sortOrder = null,
+    nameFilter = '',
+    selectedParks = []
   }) {
     try {
       const offset = (page - 1) * limit;
@@ -44,11 +47,25 @@ class FormService {
         }
       }
 
+      const where = {};
+
+      if (Array.isArray(selectedParks) && selectedParks.length > 0) {
+        where.parkId = {
+          [Op.in]: selectedParks.map((id) => Sequelize.cast(id, "uuid")), // Приведение типов
+        }
+      }
+      if (nameFilter) {
+        where.name = {
+          [Op.iLike]: `%${nameFilter}%`, // Регистронезависимый поиск с шаблоном
+        };
+      }
+
       const { rows: forms, count: total } = await Form.findAndCountAll({
         include: [{ model: Park, as: "Park", attributes: ["title", "id"] }],
         limit,
         offset,
         order,
+        where
       });
       return {
         forms,

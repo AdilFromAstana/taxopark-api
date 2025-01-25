@@ -32,11 +32,18 @@ class ParkController {
       const page = req.query.page;
       const sortOrder = req.query.sortOrder;
       const sortField = req.query.sortField;
+      const cityId = req.query.cityId;
+      const parkPromotions = req.query.parkPromotions
+        ? req.query.parkPromotions.split(",").map(Number)
+        : [];
+
       const parks = await parkService.getAllParks({
         limit,
         page,
         sortField,
         sortOrder,
+        cityId,
+        parkPromotions
       });
       return res.status(200).json(parks);
     } catch (error) {
