@@ -42,9 +42,11 @@ class FormController {
       const page = req.query.page;
       const sortOrder = req.query.sortOrder;
       const sortField = req.query.sortField;
-      const nameFilter = req.query.nameFilter;
+      const filterName = req.query.filterName;
+      const filterStartDate = req.query.filterStartDate;
+      const filterEndDate = req.query.filterEndDate;
       const selectedParks = req.query.selectedParks
-        ? req.query.selectedParks.split(",").map(v => v)
+        ? req.query.selectedParks.split(",").map((id) => id.trim())
         : [];
 
       const forms = await formService.getAllForms({
@@ -53,7 +55,9 @@ class FormController {
         sortField,
         sortOrder,
         selectedParks,
-        nameFilter
+        filterName,
+        filterStartDate,
+        filterEndDate
       });
       return res.status(200).json(forms);
     } catch (error) {

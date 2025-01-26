@@ -28,16 +28,16 @@ class FormService {
     limit = 10,
     sortField = null,
     sortOrder = null,
-    nameFilter = '',
-    selectedParks = []
+    filterName = '',
+    selectedParks = [],
+    filterStartDate = '',
+    filterEndDate = ''
   }) {
     try {
       const offset = (page - 1) * limit;
-
       const validSortOrder = ["asc", "desc"].includes(sortOrder)
         ? sortOrder
         : null;
-
       let order = [];
       if (sortField && validSortOrder) {
         if (sortField === "Park") {
@@ -46,18 +46,27 @@ class FormService {
           order.push([sortField, validSortOrder]);
         }
       }
-
       const where = {};
-
       if (Array.isArray(selectedParks) && selectedParks.length > 0) {
         where.parkId = {
-          [Op.in]: selectedParks.map((id) => Sequelize.cast(id, "uuid")), // Приведение типов
+          [Op.in]: selectedParks.map((id) => {
+            return Sequelize.cast(id, "uuid")
+          }), // Приведение типов
         }
       }
-      if (nameFilter) {
+      if (filterName) {
         where.name = {
-          [Op.iLike]: `%${nameFilter}%`, // Регистронезависимый поиск с шаблоном
+          [Op.iLike]: `%${filterName}%`, // Регистронезависимый поиск с шаблоном
         };
+      }
+      if (filterStartDate || filterEndDate) {
+        where.createdAt = {};
+        if (filterStartDate) {
+          where.createdAt[Op.gte] = new Date(filterStartDate); // Больше или равно начальной дате
+        }
+        if (filterEndDate) {
+          where.createdAt[Op.lte] = new Date(filterEndDate); // Меньше или равно конечной дате
+        }
       }
 
       const { rows: forms, count: total } = await Form.findAndCountAll({
