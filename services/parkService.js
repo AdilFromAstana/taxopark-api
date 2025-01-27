@@ -30,6 +30,9 @@ class ParkService {
     sortOrder = null,
     cityId = null,
     parkPromotions = [],
+    filteredTitle = "",
+    filteredCity = null,
+    filteredYandexGasStation = null,
   }) {
     try {
       const offset = (page - 1) * limit;
@@ -58,6 +61,18 @@ class ParkService {
           [Op.contains]: parkPromotions,
         };
       }
+      if (filteredTitle) {
+        where.title = {
+          [Op.iLike]: `%${filteredTitle}%`,
+        };
+      }
+      if (filteredCity) {
+        where.cityId = filteredCity;
+      }
+      console.log("filteredYandexGasStation: ", filteredYandexGasStation);
+      if (filteredYandexGasStation && filteredYandexGasStation !== "null") {
+        where.yandexGasStation = filteredYandexGasStation;
+      }
 
       const { rows: parks, count: total } = await Park.findAndCountAll({
         include: [
@@ -83,8 +98,6 @@ class ParkService {
       throw new Error(`Ошибка при получении списка парков: ${error.message}`);
     }
   }
-
-
 
   async updatePark(id, data) {
     try {

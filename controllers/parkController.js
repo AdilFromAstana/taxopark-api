@@ -33,6 +33,9 @@ class ParkController {
       const sortOrder = req.query.sortOrder;
       const sortField = req.query.sortField;
       const cityId = req.query.cityId;
+      const filteredTitle = req.query.filteredTitle;
+      const filteredCity = req.query.filteredCity;
+      const filteredYandexGasStation = req.query.filteredYandexGasStation;
       const parkPromotions = req.query.parkPromotions
         ? req.query.parkPromotions.split(",").map(Number)
         : [];
@@ -43,7 +46,10 @@ class ParkController {
         sortField,
         sortOrder,
         cityId,
-        parkPromotions
+        parkPromotions,
+        filteredTitle,
+        filteredCity,
+        filteredYandexGasStation,
       });
       return res.status(200).json(parks);
     } catch (error) {
