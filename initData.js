@@ -4,7 +4,11 @@ const Park = require("./models/Park");
 
 async function seedDatabase() {
   try {
-    const cities = [
+    console.log("🚀 Запуск заполнения базы данных...");
+
+    /** 🏙 **ШАГ 1: Создаём города, если их нет** */
+    console.log("📌 Создаём города...");
+    const cityData = [
       { id: "17a5888d-3586-43b4-9267-6e25a7d937ed", title: "Алматы" },
       { id: "601148ba-80f3-495b-bfd8-59df837e62f3", title: "Шымкент" },
       { id: "708fd4f0-de0a-4abe-bcbe-44bb63b02596", title: "Тараз" },
@@ -13,117 +17,120 @@ async function seedDatabase() {
       { id: "f296c37c-ef7b-4eaa-ae60-ecaca7442811", title: "Астана" },
     ];
 
-    // 2. Создание таксопарков
-    const parksData = {
-      Алматы: [
-        { title: "Таксопарк Пайда", parkCommission: 10, rating: 4.5 },
-        { title: "Табыс", parkCommission: 12, rating: 4.7 },
-        { title: "Городской Таксопарк Алматы", parkCommission: 8, rating: 4.9 },
-        { title: "Таксопарк Верный", parkCommission: 7, rating: 3.8 },
-        { title: "Первый Таксопарк", parkCommission: 5, rating: 5 },
-      ],
-      Астана: [
-        { title: "Астана Экспресс", parkCommission: 11, rating: 4.3 },
-        { title: "Байтерек Такси", parkCommission: 9, rating: 4.6 },
-        { title: "Столица Парк", parkCommission: 8, rating: 4.8 },
-        { title: "Таксопарк Ару", parkCommission: 7, rating: 3.9 },
-        { title: "Rich", parkCommission: 13, rating: 5 },
-      ],
-      Шымкент: [
-        { title: "Шымкент Люкс", parkCommission: 10, rating: 4.8 },
-        { title: "Южный Таксопарк", parkCommission: 12, rating: 4.5 },
-        { title: "Шым-Сити", parkCommission: 11, rating: 4.9 },
-        { title: "Best City", parkCommission: 8, rating: 3.9 },
-      ],
-      Караганда: [
-        { title: "Таксопарк Шахтерский", parkCommission: 14, rating: 4.6 },
-        { title: "Таксопарк Караганда", parkCommission: 14, rating: 4.6 },
-        { title: "ЦентрТакси Караганда", parkCommission: 10, rating: 4.4 },
-      ],
-      Актобе: [
-        { title: "Актобе Экспресс", parkCommission: 8, rating: 4.7 },
-        { title: "Городской парк Актобе", parkCommission: 11, rating: 4.5 },
-        { title: "Актобе Люкс", parkCommission: 10, rating: 5.0 },
-      ],
-      Тараз: [
-        { title: "Тараз Экспресс", parkCommission: 6, rating: 4.9 },
-        { title: "Тараз Таксопарк", parkCommission: 9, rating: 4.6 },
-        { title: "Центральный Парк Тараз", parkCommission: 13, rating: 4.8 },
-      ],
-    };
-
-    for (const [cityTitle, parks] of Object.entries(parksData)) {
-      const city = cities.find((c) => c.title === cityTitle);
-      for (const park of parks) {
-        await Park.create({
-          ...park,
-          cityId: city.id,
-          yandexGasStation: Math.random() > 0.5,
-          supportWorkTime: "24/7",
-          parkPromotions: [1, 2, 3],
-        });
-      }
+    for (const city of cityData) {
+      await City.findOrCreate({
+        where: { title: city.title },
+        defaults: city,
+      });
     }
+    console.log("✅ Города успешно добавлены!");
 
-    // 3. Создание форм
-    const maleNames = [
-      "Азамат",
-      "Серик",
-      "Марат",
-      "Кайрат",
-      "Бауыржан",
-      "Али",
-      "Айбек",
-      "Айдос",
+    /** 🚕 **ШАГ 2: Создаём таксопарки, если их нет** */
+    console.log("📌 Создаём таксопарки...");
+    const parksData = [
+      {
+        title: "Таксопарк Пайда",
+        cityId: "17a5888d-3586-43b4-9267-6e25a7d937ed",
+        parkCommission: 10,
+        rating: 4.5,
+      },
+      {
+        title: "Табыс",
+        cityId: "17a5888d-3586-43b4-9267-6e25a7d937ed",
+        parkCommission: 12,
+        rating: 4.7,
+      },
+      {
+        title: "Городской Таксопарк Алматы",
+        cityId: "17a5888d-3586-43b4-9267-6e25a7d937ed",
+        parkCommission: 8,
+        rating: 4.9,
+      },
+      {
+        title: "Астана Экспресс",
+        cityId: "f296c37c-ef7b-4eaa-ae60-ecaca7442811",
+        parkCommission: 11,
+        rating: 4.3,
+      },
+      {
+        title: "Байтерек Такси",
+        cityId: "f296c37c-ef7b-4eaa-ae60-ecaca7442811",
+        parkCommission: 9,
+        rating: 4.6,
+      },
+      {
+        title: "Шымкент Люкс",
+        cityId: "601148ba-80f3-495b-bfd8-59df837e62f3",
+        parkCommission: 10,
+        rating: 4.8,
+      },
     ];
-    const femaleNames = ["Аружан", "Мадина", "Динара", "Айгерим", "Жанна"];
-    const surnames = [
-      "Ахметов",
-      "Омаров",
-      "Серик",
-      "Оспанов",
-      "Алиев",
-      "Байжанов",
-      "Кутпанов",
-      "Аманжол",
-    ];
 
-    const parks = await Park.findAll();
+    for (const park of parksData) {
+      await Park.findOrCreate({
+        where: { title: park.title },
+        defaults: park,
+      });
+    }
+    console.log("✅ Таксопарки успешно добавлены!");
 
-    // Формы для таксопарков (50 форм)
-    for (let i = 0; i < 50; i++) {
-      const isMale = Math.random() > 0.5;
-      const name = isMale
-        ? maleNames[Math.floor(Math.random() * maleNames.length)]
-        : femaleNames[Math.floor(Math.random() * femaleNames.length)];
-      const surname = surnames[Math.floor(Math.random() * surnames.length)];
-      const randomPark = parks[Math.floor(Math.random() * parks.length)];
-      await Form.create({
-        name: `${name} ${surname}`,
-        phoneNumber: `+7701${Math.floor(1000000 + Math.random() * 9000000)}`,
-        parkId: randomPark.id,
+    /** 📝 **ШАГ 3: Создаём формы таксопарков, если их нет** */
+    console.log("📌 Создаём формы таксопарков...");
+    const formsData = [
+      {
+        name: "Азамат Ахметов",
+        phoneNumber: "+77011234567",
+        parkId: parksData[0].id,
         formType: "taxiPark",
+      },
+      {
+        name: "Серик Омаров",
+        phoneNumber: "+77019876543",
+        parkId: parksData[1].id,
+        formType: "taxiPark",
+      },
+      {
+        name: "Марат Серик",
+        phoneNumber: "+77019875432",
+        parkId: parksData[2].id,
+        formType: "taxiPark",
+      },
+    ];
+
+    for (const form of formsData) {
+      await Form.findOrCreate({
+        where: { phoneNumber: form.phoneNumber },
+        defaults: form,
       });
     }
+    console.log("✅ Формы таксопарков успешно созданы!");
 
-    // Формы для консультаций (20 форм)
-    for (let i = 0; i < 20; i++) {
-      const isMale = Math.random() > 0.5;
-      const name = isMale
-        ? maleNames[Math.floor(Math.random() * maleNames.length)]
-        : femaleNames[Math.floor(Math.random() * femaleNames.length)];
-      const surname = surnames[Math.floor(Math.random() * surnames.length)];
-      await Form.create({
-        name: `${name} ${surname}`,
-        surname,
-        phoneNumber: `+7705${Math.floor(1000000 + Math.random() * 9000000)}`,
+    /** 📞 **ШАГ 4: Создаём формы для консультаций, если их нет** */
+    console.log("📌 Создаём формы для консультаций...");
+    const consultationForms = [
+      {
+        name: "Айгерим Аманова",
+        phoneNumber: "+77059873210",
         formType: "consultation",
+      },
+      {
+        name: "Жанна Кутпанова",
+        phoneNumber: "+77051122334",
+        formType: "consultation",
+      },
+    ];
+
+    for (const form of consultationForms) {
+      await Form.findOrCreate({
+        where: { phoneNumber: form.phoneNumber },
+        defaults: form,
       });
     }
+    console.log("✅ Формы для консультаций успешно созданы!");
 
-    console.log("База данных успешно заполнена.");
+    console.log("🎉 База данных полностью заполнена статичными данными!");
   } catch (error) {
-    console.error("Ошибка при заполнении базы данных:", error);
+    console.error("❌ Ошибка при заполнении базы данных:", error);
   }
 }
 

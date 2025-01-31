@@ -25,13 +25,17 @@ const Park = sequelize.define("Park", {
     allowNull: true,
     validate: {
       isValidArray(value) {
-        if (!Array.isArray(value) || value.some((num) => num <= 0)) {
+        if (!Array.isArray(value)) {
+          throw new Error("Значение должно быть массивом.");
+        }
+        if (value.some((num) => typeof num !== "number" || num <= 0)) {
           throw new Error(
             "Все элементы массива должны быть положительными числами."
           );
         }
       },
     },
+    defaultValue: [], // Устанавливаем пустой массив по умолчанию
   },
   paymentType: { type: DataTypes.INTEGER, allowNull: true },
   active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
