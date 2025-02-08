@@ -1,7 +1,6 @@
 const cityService = require("../services/cityService");
 
 class CityController {
-  // Создание города
   async createCity(req, res) {
     try {
       const { title } = req.body;
@@ -17,7 +16,6 @@ class CityController {
     }
   }
 
-  // Получение города по ID
   async getCityById(req, res) {
     try {
       const { id } = req.params;
@@ -28,7 +26,6 @@ class CityController {
     }
   }
 
-  // Получение всех городов
   async getAllCities(req, res) {
     try {
       const cities = await cityService.getAllCities();
@@ -38,7 +35,6 @@ class CityController {
     }
   }
 
-  // Обновление города
   async updateCity(req, res) {
     try {
       const { id } = req.params;

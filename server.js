@@ -2,7 +2,7 @@ const app = require("./app");
 const sequelize = require("./db");
 const initializeData = require("./initData");
 
-const PORT = 5000; // Порт для API
+const PORT = 5000;
 
 const start = async () => {
   try {

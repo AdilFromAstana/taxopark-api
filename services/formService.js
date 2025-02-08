@@ -1,12 +1,27 @@
 const { Op, Sequelize } = require("sequelize");
-const { Park, Form } = require("../models/index");
+const { Park, Form, FormStatus, FormStatusHistory } = require("../models/index");
 
 class FormService {
   async createForm({ name, parkId, formType, phoneNumber }) {
+    const transaction = await Sequelize.transaction();
     try {
-      const form = await Form.create({ name, parkId, formType, phoneNumber });
+      const form = await Form.create({ name, parkId, formType, phoneNumber }, { transaction });
+
+      if (formType === "consultation") {
+        const initialStatus = await FormStatus.findOne({ where: { code: "registered" } });
+        if (!initialStatus) {
+          throw new Error("Initial status 'registered' not found");
+        }
+        await FormStatusHistory.create({
+          formId: form.id,
+          newStatusId: initialStatus.id,
+        }, { transaction });
+      }
+
+      await transaction.commit();
       return form;
     } catch (error) {
+      await transaction.rollback();
       throw new Error(`Ошибка при создании формы: ${error.message}`);
     }
   }

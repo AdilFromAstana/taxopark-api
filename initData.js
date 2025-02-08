@@ -1,12 +1,29 @@
 const Form = require("./models/Form");
 const City = require("./models/City");
 const Park = require("./models/Park");
+const FormStatus = require("./models/FormStatus");
 
 async function seedDatabase() {
   try {
     console.log("🚀 Запуск заполнения базы данных...");
 
-    /** 🏙 **ШАГ 1: Создаём города, если их нет** */
+    console.log("📌 Создаём статусы форм...");
+    const formStatuses = [
+      { code: "registered", name: "Registered" },
+      { code: "sent_to_another_park", name: "Sent to Another Park" },
+      { code: "thinking", name: "Thinking" },
+      { code: "no_answer", name: "No Answer" },
+      { code: "incorrect_data", name: "Incorrect Data" },
+    ];
+
+    for (const status of formStatuses) {
+      await FormStatus.findOrCreate({
+        where: { code: status.code },
+        defaults: status,
+      });
+    }
+    console.log("✅ Статусы форм успешно добавлены!");
+
     console.log("📌 Создаём города...");
     const cityData = [
       { id: "17a5888d-3586-43b4-9267-6e25a7d937ed", title: "Алматы" },
@@ -25,7 +42,6 @@ async function seedDatabase() {
     }
     console.log("✅ Города успешно добавлены!");
 
-    /** 🚕 **ШАГ 2: Создаём таксопарки, если их нет** */
     console.log("📌 Создаём таксопарки...");
     const parksData = [
       {
@@ -74,7 +90,6 @@ async function seedDatabase() {
     }
     console.log("✅ Таксопарки успешно добавлены!");
 
-    /** 📝 **ШАГ 3: Создаём формы таксопарков, если их нет** */
     console.log("📌 Создаём формы таксопарков...");
     const formsData = [
       {
@@ -105,7 +120,6 @@ async function seedDatabase() {
     }
     console.log("✅ Формы таксопарков успешно созданы!");
 
-    /** 📞 **ШАГ 4: Создаём формы для консультаций, если их нет** */
     console.log("📌 Создаём формы для консультаций...");
     const consultationForms = [
       {
@@ -126,8 +140,6 @@ async function seedDatabase() {
         defaults: form,
       });
     }
-    console.log("✅ Формы для консультаций успешно созданы!");
-
     console.log("🎉 База данных полностью заполнена статичными данными!");
   } catch (error) {
     console.error("❌ Ошибка при заполнении базы данных:", error);

@@ -9,14 +9,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
-// const authRoutes = require("./routes/authRoutes");
 const parkRoutes = require("./routes/parkRoutes");
 const formRoutes = require("./routes/formRoutes");
 const cityRoutes = require("./routes/cityRoutes");
+const promotionRoutes = require("./routes/promotionRoutes");
 
-// app.use("/api/auth", authRoutes);
-app.use("/api/cities", cityRoutes);
-app.use("/api/forms", formRoutes);
-app.use("/api/parks", parkRoutes);
+app.use("/cities", cityRoutes);
+app.use("/promotions", promotionRoutes);
+app.use("/forms", formRoutes);
+app.use("/parks", parkRoutes);
 
 module.exports = app;
