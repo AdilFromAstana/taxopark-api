@@ -74,7 +74,7 @@ class ParkService {
         where.yandexGasStation = filteredYandexGasStation;
       }
 
-      const { rows: parks, count: total } = await Park.findAndCountAll({
+      const { rows: data, count: total } = await Park.findAndCountAll({
         include: [
           {
             model: City,
@@ -89,7 +89,7 @@ class ParkService {
       });
 
       return {
-        parks,
+        data,
         total,
         page,
         totalPages: Math.ceil(total / limit),

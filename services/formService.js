@@ -1,21 +1,34 @@
 const { Op, Sequelize } = require("sequelize");
-const { Park, Form, FormStatus, FormStatusHistory } = require("../models/index");
+const {
+  Park,
+  Form,
+  FormStatus,
+  FormStatusHistory,
+} = require("../models/index");
 
 class FormService {
   async createForm({ name, parkId, formType, phoneNumber }) {
     const transaction = await Sequelize.transaction();
     try {
-      const form = await Form.create({ name, parkId, formType, phoneNumber }, { transaction });
+      const form = await Form.create(
+        { name, parkId, formType, phoneNumber },
+        { transaction }
+      );
 
       if (formType === "consultation") {
-        const initialStatus = await FormStatus.findOne({ where: { code: "registered" } });
+        const initialStatus = await FormStatus.findOne({
+          where: { code: "registered" },
+        });
         if (!initialStatus) {
           throw new Error("Initial status 'registered' not found");
         }
-        await FormStatusHistory.create({
-          formId: form.id,
-          newStatusId: initialStatus.id,
-        }, { transaction });
+        await FormStatusHistory.create(
+          {
+            formId: form.id,
+            newStatusId: initialStatus.id,
+          },
+          { transaction }
+        );
       }
 
       await transaction.commit();
@@ -43,10 +56,10 @@ class FormService {
     limit = 10,
     sortField = null,
     sortOrder = null,
-    filterName = '',
+    filterName = "",
     selectedParks = [],
-    filterStartDate = '',
-    filterEndDate = ''
+    filterStartDate = "",
+    filterEndDate = "",
   }) {
     try {
       const offset = (page - 1) * limit;
@@ -65,9 +78,9 @@ class FormService {
       if (Array.isArray(selectedParks) && selectedParks.length > 0) {
         where.parkId = {
           [Op.in]: selectedParks.map((id) => {
-            return Sequelize.cast(id, "uuid")
+            return Sequelize.cast(id, "uuid");
           }), // Приведение типов
-        }
+        };
       }
       if (filterName) {
         where.name = {
@@ -84,15 +97,15 @@ class FormService {
         }
       }
 
-      const { rows: forms, count: total } = await Form.findAndCountAll({
+      const { rows: data, count: total } = await Form.findAndCountAll({
         include: [{ model: Park, as: "Park", attributes: ["title", "id"] }],
         limit,
         offset,
         order,
-        where
+        where,
       });
       return {
-        forms,
+        data,
         total,
         page,
         totalPages: Math.ceil(total / limit),
