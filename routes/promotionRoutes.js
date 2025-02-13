@@ -1,11 +1,11 @@
 const Router = require("express");
+const promotionController = require("../controllers/promotionController");
 const router = new Router();
-const PromotionController = require("../controllers/PromotionController");
 
-router.post("/", PromotionController.createPromotion);
-router.get("/", PromotionController.getAllPromotions);
-router.get("/:id", PromotionController.getPromotionById);
-router.put("/:id", PromotionController.updatePromotion);
-router.delete("/:id", PromotionController.deletePromotion);
+router.post("/", promotionController.createPromotion);
+router.get("/", promotionController.getAllPromotions);
+router.get("/:id", promotionController.getPromotionById);
+router.put("/:id", promotionController.updatePromotion);
+router.delete("/:id", promotionController.deletePromotion);
 
 module.exports = router;

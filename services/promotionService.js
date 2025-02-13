@@ -75,7 +75,6 @@ class PromotionService {
         include: [
           {
             model: Park,
-            as: "park",
             attributes: ["title", "id"], // Загружаем только нужные поля парка
           },
         ],

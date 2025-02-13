@@ -112,6 +112,24 @@ class ParkService {
       throw new Error(`Ошибка при обновлении парка: ${error.message}`);
     }
   }
+
+  async getByName(title) {
+    try {
+      const parks = await Park.findAll({
+        where: {
+          title: {
+            [Op.iLike]: `%${title}%`,
+          },
+        },
+        limit: 10,
+      });
+  
+      return parks;
+    } catch (error) {
+      throw new Error(`Ошибка при поиске парка по названию: ${error.message}`);
+    }
+  }
+  
 }
 
 module.exports = new ParkService();

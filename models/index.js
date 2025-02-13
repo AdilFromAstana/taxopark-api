@@ -7,8 +7,8 @@ const Promotion = require("./Promotion");
 const FormStatus = require("./FormStatus");
 const FormStatusHistory = require("./FormStatusHistory");
 
-Park.hasMany(Promotion, { foreignKey: "parkId", as: "promotions" });
-Promotion.belongsTo(Park, { foreignKey: "parkId", as: "park" });
+Park.hasMany(Promotion, { foreignKey: "parkId" });
+Promotion.belongsTo(Park, { foreignKey: "parkId" });
 Park.belongsTo(City, { foreignKey: "cityId", targetKey: "id" });
 Form.belongsTo(Park, { foreignKey: "parkId", targetKey: "id" });
 FormStatusHistory.belongsTo(Form, { foreignKey: "formId", targetKey: "id" });

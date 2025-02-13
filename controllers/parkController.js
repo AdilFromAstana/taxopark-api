@@ -67,6 +67,24 @@ class ParkController {
       return res.status(500).json({ message: error.message });
     }
   }
+
+  async getByName(req, res) {
+    try {
+      const { title } = req.query; // Используем query-параметр вместо req.params
+      console.log("title: ", title)
+  
+      if (!title) {
+        return res.status(400).json({ message: "Название парка не указано." });
+      }
+  
+      const parks = await parkService.getByName(title);
+      
+      return res.status(200).json(parks);
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  }
+  
 }
 
 module.exports = new ParkController();
