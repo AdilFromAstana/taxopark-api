@@ -10,6 +10,7 @@ const Form = sequelize.define("Form", {
   },
   name: { type: DataTypes.STRING, allowNull: false },
   parkId: { type: DataTypes.UUID, allowNull: true },
+  statusCode: { type: DataTypes.STRING, allowNull: false },
   formType: {
     type: DataTypes.ENUM("consultation", "taxiPark"),
     allowNull: false,

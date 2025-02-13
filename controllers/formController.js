@@ -1,4 +1,3 @@
-const { UUID } = require("sequelize");
 const formService = require("../services/formService");
 
 class FormController {
@@ -30,6 +29,17 @@ class FormController {
     try {
       const { id } = req.params;
       const form = await formService.getFormById(id);
+      return res.status(200).json(form);
+    } catch (error) {
+      return res.status(404).json({ message: error.message });
+    }
+  }
+
+  async getStatusHistoryById(req, res) {
+    try {
+      const { id } = req.params;
+      console.log("id: ", id)
+      const form = await formService.getStatusHistoryById(id);
       return res.status(200).json(form);
     } catch (error) {
       return res.status(404).json({ message: error.message });
@@ -78,6 +88,22 @@ class FormController {
       });
 
       return res.status(200).json(form);
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  }
+
+  async updateFormStatus(req, res) {
+    try {
+      const { id } = req.params;
+      const { newStatusCode, reason } = req.body;
+
+      if (!newStatusCode) {
+        return res.status(400).json({ message: "Необходимо указать новый статус." });
+      }
+
+      const updatedForm = await formService.updateFormStatus(id, newStatusCode, reason);
+      return res.status(200).json(updatedForm);
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }

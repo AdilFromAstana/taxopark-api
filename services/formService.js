@@ -1,9 +1,10 @@
-const { Op, Sequelize } = require("sequelize");
+const { Op } = require("sequelize");
 const {
   Park,
   Form,
   FormStatus,
   FormStatusHistory,
+  sequelize
 } = require("../models/index");
 
 class FormService {
@@ -46,6 +47,18 @@ class FormService {
         throw new Error("Форма не найдена.");
       }
       return form;
+    } catch (error) {
+      throw new Error(`Ошибка при получении формы: ${error.message}`);
+    }
+  }
+
+  async getStatusHistoryById(id) {
+    try {
+      const forms = await FormStatusHistory.findAll({ where: { formId: id } });
+      if (!forms) {
+        throw new Error("Форма не найдена.");
+      }
+      return forms;
     } catch (error) {
       throw new Error(`Ошибка при получении формы: ${error.message}`);
     }
@@ -131,6 +144,38 @@ class FormService {
       return form;
     } catch (error) {
       throw new Error(`Ошибка при обновлении формы: ${error.message}`);
+    }
+  }
+
+  async updateFormStatus(formId, newStatusCode, reason = null) {
+    console.log("newStatusCode: ", newStatusCode)
+    const transaction = await sequelize.transaction();
+    try {
+      // Найти форму
+      const form = await Form.findByPk(formId, { transaction });
+      if (!form) {
+        throw new Error("Форма не найдена.");
+      }
+
+      // Добавить запись в историю смены статусов
+      await FormStatusHistory.create(
+        {
+          formId,
+          newStatusCode,
+          reason, // Сохраняем причину (если есть)
+        },
+        { transaction }
+      );
+
+      // Обновить статус формы
+      form.statusCode = newStatusCode;
+      await form.save({ transaction });
+
+      await transaction.commit();
+      return form;
+    } catch (error) {
+      await transaction.rollback();
+      throw new Error(`Ошибка при обновлении статуса формы: ${error.message}`);
     }
   }
 }

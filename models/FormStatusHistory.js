@@ -13,13 +13,13 @@ const FormStatusHistory = sequelize.define("FormStatusHistory", {
         type: DataTypes.UUID,
         allowNull: false,
     },
-    newStatusId: {
-        type: DataTypes.UUID,
+    newStatusCode: {
+        type: DataTypes.STRING,
         allowNull: false,
-        references: {
-            model: FormStatus,
-            key: "id",
-        },
+    },
+    reason: {
+        type: DataTypes.STRING,
+        allowNull: true,
     },
     createdAt: {
         type: DataTypes.DATE,
