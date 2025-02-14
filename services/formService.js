@@ -4,33 +4,25 @@ const {
   Form,
   FormStatus,
   FormStatusHistory,
-  sequelize
+  sequelize,
 } = require("../models/index");
 
 class FormService {
   async createForm({ name, parkId, formType, phoneNumber }) {
-    const transaction = await Sequelize.transaction();
+    const transaction = await sequelize.transaction();
     try {
       const form = await Form.create(
-        { name, parkId, formType, phoneNumber },
+        { name, parkId, formType, phoneNumber, statusCode: "registered" },
         { transaction }
       );
 
-      if (formType === "consultation") {
-        const initialStatus = await FormStatus.findOne({
-          where: { code: "registered" },
-        });
-        if (!initialStatus) {
-          throw new Error("Initial status 'registered' not found");
-        }
-        await FormStatusHistory.create(
-          {
-            formId: form.id,
-            newStatusId: initialStatus.id,
-          },
-          { transaction }
-        );
-      }
+      await FormStatusHistory.create(
+        {
+          formId: form.id,
+          newStatusCode: "registered",
+        },
+        { transaction }
+      );
 
       await transaction.commit();
       return form;
@@ -74,7 +66,6 @@ class FormService {
     filterStartDate = "",
     filterEndDate = "",
   }) {
-    console.log("sortField: ", sortField)
     try {
       const offset = (page - 1) * limit;
       const validSortOrder = ["asc", "desc"].includes(sortOrder)
