@@ -74,6 +74,7 @@ class FormService {
     filterStartDate = "",
     filterEndDate = "",
   }) {
+    console.log("sortField: ", sortField)
     try {
       const offset = (page - 1) * limit;
       const validSortOrder = ["asc", "desc"].includes(sortOrder)
@@ -91,7 +92,7 @@ class FormService {
       if (Array.isArray(selectedParks) && selectedParks.length > 0) {
         where.parkId = {
           [Op.in]: selectedParks.map((id) => {
-            return Sequelize.cast(id, "uuid");
+            return sequelize.cast(id, "uuid");
           }), // Приведение типов
         };
       }
@@ -148,26 +149,25 @@ class FormService {
   }
 
   async updateFormStatus(formId, newStatusCode, reason = null) {
-    console.log("newStatusCode: ", newStatusCode)
     const transaction = await sequelize.transaction();
     try {
-      // Найти форму
       const form = await Form.findByPk(formId, { transaction });
       if (!form) {
         throw new Error("Форма не найдена.");
       }
+      if (form.newStatusCode === newStatusCode) {
+        throw new Error("Нельзя изменить статус на текущий!");
+      }
 
-      // Добавить запись в историю смены статусов
       await FormStatusHistory.create(
         {
           formId,
           newStatusCode,
-          reason, // Сохраняем причину (если есть)
+          reason,
         },
         { transaction }
       );
 
-      // Обновить статус формы
       form.statusCode = newStatusCode;
       await form.save({ transaction });
 

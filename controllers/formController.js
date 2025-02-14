@@ -38,7 +38,6 @@ class FormController {
   async getStatusHistoryById(req, res) {
     try {
       const { id } = req.params;
-      console.log("id: ", id)
       const form = await formService.getStatusHistoryById(id);
       return res.status(200).json(form);
     } catch (error) {
