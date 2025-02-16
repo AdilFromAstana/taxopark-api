@@ -3,9 +3,12 @@ const { Park, City } = require("../models/index");
 
 class ParkService {
   async createPark(data) {
+    const supportStartWorkTime = data?.supportWorkTime[0];
+    const supportEndWorkTime = data?.supportWorkTime[1];
     try {
-      const park = await Park.create(data);
-      return park;
+      const park = await Park.create({ ...data, supportEndWorkTime, supportStartWorkTime });
+      const createdData = { ...park, supportWorkTime: [supportStartWorkTime, supportEndWorkTime] }
+      return createdData;
     } catch (error) {
       throw new Error(`Ошибка при создании парка: ${error.message}`);
     }
@@ -30,7 +33,7 @@ class ParkService {
     sortOrder = null,
     cityId = null,
     parkPromotions = [],
-    filteredTitle = "",
+    title = "",
     filteredCity = null,
     filteredYandexGasStation = null,
   }) {
@@ -61,15 +64,14 @@ class ParkService {
           [Op.contains]: parkPromotions,
         };
       }
-      if (filteredTitle) {
+      if (title) {
         where.title = {
-          [Op.iLike]: `%${filteredTitle}%`,
+          [Op.iLike]: `%${title}%`,
         };
       }
       if (filteredCity) {
         where.cityId = filteredCity;
       }
-      console.log("filteredYandexGasStation: ", filteredYandexGasStation);
       if (filteredYandexGasStation && filteredYandexGasStation !== "null") {
         where.yandexGasStation = filteredYandexGasStation;
       }
@@ -123,13 +125,13 @@ class ParkService {
         },
         limit: 10,
       });
-  
+
       return parks;
     } catch (error) {
       throw new Error(`Ошибка при поиске парка по названию: ${error.message}`);
     }
   }
-  
+
 }
 
 module.exports = new ParkService();

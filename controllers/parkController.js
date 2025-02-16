@@ -33,7 +33,7 @@ class ParkController {
       const sortOrder = req.query.sortOrder;
       const sortField = req.query.sortField;
       const cityId = req.query.cityId;
-      const filteredTitle = req.query.filteredTitle;
+      const title = req.query.title;
       const filteredCity = req.query.filteredCity;
       const filteredYandexGasStation = req.query.filteredYandexGasStation;
       const parkPromotions = req.query.parkPromotions
@@ -47,7 +47,7 @@ class ParkController {
         sortOrder,
         cityId,
         parkPromotions,
-        filteredTitle,
+        title,
         filteredCity,
         filteredYandexGasStation,
       });
@@ -72,19 +72,19 @@ class ParkController {
     try {
       const { title } = req.query; // Используем query-параметр вместо req.params
       console.log("title: ", title)
-  
+
       if (!title) {
         return res.status(400).json({ message: "Название парка не указано." });
       }
-  
+
       const parks = await parkService.getByName(title);
-      
+
       return res.status(200).json(parks);
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
   }
-  
+
 }
 
 module.exports = new ParkController();
