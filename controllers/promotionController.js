@@ -39,6 +39,7 @@ class PromotionController {
       const sortOrder = req.query.sortOrder;
       const sortField = req.query.sortField;
       const parkId = req.query.parkId;
+      const title = req.query.title;
 
       const promotions = await promotionService.getAllPromotions({
         limit,
@@ -46,6 +47,7 @@ class PromotionController {
         sortOrder,
         sortField,
         parkId,
+        title,
       });
       return res.status(200).json(promotions);
     } catch (error) {

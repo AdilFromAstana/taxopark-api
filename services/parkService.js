@@ -5,9 +5,25 @@ class ParkService {
   async createPark(data) {
     const supportStartWorkTime = data?.supportWorkTime[0];
     const supportEndWorkTime = data?.supportWorkTime[1];
+
+    if (data.supportAlwaysAvailable === false) {
+      if (!supportStartWorkTime || !supportEndWorkTime) {
+        throw new Error(
+          "Для парков без круглосуточной поддержки необходимо указать рабочее время (начало и конец)."
+        );
+      }
+    }
+
     try {
-      const park = await Park.create({ ...data, supportEndWorkTime, supportStartWorkTime });
-      const createdData = { ...park, supportWorkTime: [supportStartWorkTime, supportEndWorkTime] }
+      const park = await Park.create({
+        ...data,
+        supportEndWorkTime,
+        supportStartWorkTime,
+      });
+      const createdData = {
+        ...park,
+        supportWorkTime: [supportStartWorkTime, supportEndWorkTime],
+      };
       return createdData;
     } catch (error) {
       throw new Error(`Ошибка при создании парка: ${error.message}`);
@@ -107,7 +123,22 @@ class ParkService {
       if (!park) {
         throw new Error("Парк не найден.");
       }
-      Object.assign(park, data);
+      const supportStartWorkTime = data?.supportWorkTime?.[0] || null;
+      const supportEndWorkTime = data?.supportWorkTime?.[1] || null;
+      if (data.supportAlwaysAvailable === false) {
+        if (!supportStartWorkTime || !supportEndWorkTime) {
+          throw new Error(
+            "Для парков без круглосуточной поддержки необходимо указать рабочее время (начало и конец)."
+          );
+        }
+      }
+
+      Object.assign(park, {
+        ...data,
+        supportStartWorkTime,
+        supportEndWorkTime,
+      });
+
       await park.save();
       return park;
     } catch (error) {
@@ -131,7 +162,6 @@ class ParkService {
       throw new Error(`Ошибка при поиске парка по названию: ${error.message}`);
     }
   }
-
 }
 
 module.exports = new ParkService();

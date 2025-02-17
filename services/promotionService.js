@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { Promotion, Park } = require("../models/index");
 
 class PromotionService {
@@ -43,7 +44,7 @@ class PromotionService {
     sortField = null,
     sortOrder = null,
     parkId = null,
-    filteredTitle = "",
+    title = "",
   }) {
     try {
       const offset = (page - 1) * limit;
@@ -65,9 +66,9 @@ class PromotionService {
       if (parkId && parkId !== "null") {
         where.parkId = parkId;
       }
-      if (filteredTitle) {
+      if (title) {
         where.title = {
-          [Op.iLike]: `%${filteredTitle}%`,
+          [Op.iLike]: `%${title}%`,
         };
       }
 
