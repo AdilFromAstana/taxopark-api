@@ -14,7 +14,9 @@ const Park = sequelize.define("Park", {
   transferPaymentCommission: { type: DataTypes.DECIMAL, allowNull: true },
   accountantSupport: { type: DataTypes.BOOLEAN, allowNull: true },
   yandexGasStation: { type: DataTypes.BOOLEAN, allowNull: true },
-  supportWorkTime: { type: DataTypes.STRING, allowNull: true },
+  supportStartWorkTime: { type: DataTypes.STRING, allowNull: true },
+  supportEndWorkTime: { type: DataTypes.STRING, allowNull: true },
+  supportAlwaysAvailable: { type: DataTypes.BOOLEAN, allowNull: true },
   parkCommission: {
     type: DataTypes.DECIMAL,
     allowNull: false,
@@ -35,7 +37,7 @@ const Park = sequelize.define("Park", {
         }
       },
     },
-    defaultValue: [], // Устанавливаем пустой массив по умолчанию
+    defaultValue: [],
   },
   paymentType: { type: DataTypes.INTEGER, allowNull: true },
   active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
