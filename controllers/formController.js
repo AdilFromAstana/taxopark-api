@@ -17,7 +17,7 @@ class FormController {
         parkId,
         formType,
         phoneNumber,
-        selectedParks
+        selectedParks,
       });
       return res.status(201).json(form);
     } catch (error) {
@@ -66,7 +66,7 @@ class FormController {
         selectedParks,
         filterName,
         filterStartDate,
-        filterEndDate
+        filterEndDate,
       });
       return res.status(200).json(forms);
     } catch (error) {
@@ -98,10 +98,16 @@ class FormController {
       const { newStatusCode, reason } = req.body;
 
       if (!newStatusCode) {
-        return res.status(400).json({ message: "Необходимо указать новый статус." });
+        return res
+          .status(400)
+          .json({ message: "Необходимо указать новый статус." });
       }
 
-      const updatedForm = await formService.updateFormStatus(id, newStatusCode, reason);
+      const updatedForm = await formService.updateFormStatus(
+        id,
+        newStatusCode,
+        reason
+      );
       return res.status(200).json(updatedForm);
     } catch (error) {
       return res.status(500).json({ message: error.message });

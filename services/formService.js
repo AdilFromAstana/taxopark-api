@@ -9,10 +9,20 @@ const {
 
 class FormService {
   async createForm({ name, parkId, formType, phoneNumber }) {
+    if (formType === "taxiPark" && !parkId) {
+      throw new Error("Поле parkId обязательно для типа формы 'taxiPark'");
+    }
+    console.log("parkId: ", parkId)
     const transaction = await sequelize.transaction();
     try {
       const form = await Form.create(
-        { name, parkId, formType, phoneNumber, statusCode: "registered" },
+        {
+          name,
+          parkId,
+          formType,
+          phoneNumber,
+          statusCode: "registered",
+        },
         { transaction }
       );
 

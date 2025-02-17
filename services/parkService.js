@@ -123,13 +123,12 @@ class ParkService {
         },
         limit: 10,
       });
-  
+
       return parks;
     } catch (error) {
       throw new Error(`Ошибка при поиске парка по названию: ${error.message}`);
     }
   }
-  
 }
 
 module.exports = new ParkService();
