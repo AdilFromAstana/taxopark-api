@@ -3,8 +3,19 @@ const { Park, City } = require("../models/index");
 
 class ParkService {
   async createPark(data) {
-    const supportStartWorkTime = data?.supportWorkTime[0];
-    const supportEndWorkTime = data?.supportWorkTime[1];
+    if (!data) {
+      throw new Error("Передан некорректный объект данных");
+    }
+
+    const supportStartWorkTime =
+      Array.isArray(data.supportWorkTime) && data.supportWorkTime.length > 0
+        ? data.supportWorkTime[0]
+        : null;
+
+    const supportEndWorkTime =
+      Array.isArray(data.supportWorkTime) && data.supportWorkTime.length > 1
+        ? data.supportWorkTime[1]
+        : null;
 
     if (data.supportAlwaysAvailable === false) {
       if (!supportStartWorkTime || !supportEndWorkTime) {
@@ -123,8 +134,18 @@ class ParkService {
       if (!park) {
         throw new Error("Парк не найден.");
       }
-      const supportStartWorkTime = data?.supportWorkTime?.[0] || null;
-      const supportEndWorkTime = data?.supportWorkTime?.[1] || null;
+      if (!data) {
+        throw new Error("Передан некорректный объект данных");
+      }
+      const supportStartWorkTime =
+        Array.isArray(data.supportWorkTime) && data.supportWorkTime.length > 0
+          ? data.supportWorkTime[0]
+          : null;
+
+      const supportEndWorkTime =
+        Array.isArray(data.supportWorkTime) && data.supportWorkTime.length > 1
+          ? data.supportWorkTime[1]
+          : null;
       if (data.supportAlwaysAvailable === false) {
         if (!supportStartWorkTime || !supportEndWorkTime) {
           throw new Error(
