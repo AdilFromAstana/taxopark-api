@@ -17,6 +17,10 @@ const Promotion = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    imageUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     description: {
       type: DataTypes.TEXT,
       allowNull: false,

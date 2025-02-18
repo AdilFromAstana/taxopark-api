@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const path = require("path");
 
 dotenv.config();
 const app = express();
@@ -8,6 +9,10 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
+
+console.log("path.join(__dirname, ../uploads)): ", path.join(__dirname, "../uploads/1739817563720.jpg"))
+
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 const parkRoutes = require("./routes/parkRoutes");
 const formRoutes = require("./routes/formRoutes");

@@ -40,6 +40,7 @@ const Park = sequelize.define("Park", {
     defaultValue: [],
   },
   paymentType: { type: DataTypes.INTEGER, allowNull: true },
+  imageUrl: { type: DataTypes.STRING, allowNull: true },
   active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
   rating: { type: DataTypes.DECIMAL, allowNull: true },
   cityId: { type: DataTypes.UUID, allowNull: false },

@@ -2,10 +2,12 @@ const Router = require("express");
 const router = new Router();
 const parkController = require("../controllers/parkController");
 
-router.post("/", parkController.createPark);
+router.post("/create", parkController.createPark);
 router.get("/getById/:id", parkController.getParkById);
 router.get("/", parkController.getAllParks);
-router.put("/:id", parkController.updatePark);
+router.put("/update/:id", parkController.updatePark);
+router.post("/uploadImage/:id", parkController.uploadImage);
+router.delete("/deleteImage/:id", parkController.deleteImage);
 router.get("/getByName/", parkController.getByName);
 
 module.exports = router;

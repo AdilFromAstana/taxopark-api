@@ -12,7 +12,6 @@ class FormService {
     if (formType === "taxiPark" && !parkId) {
       throw new Error("Поле parkId обязательно для типа формы 'taxiPark'");
     }
-    console.log("parkId: ", parkId)
     const transaction = await sequelize.transaction();
     try {
       const form = await Form.create(
@@ -72,9 +71,11 @@ class FormService {
     sortField = null,
     sortOrder = null,
     filterName = "",
-    selectedParks = [],
+    phoneNumber = "",
+    parkId = "",
     filterStartDate = "",
     filterEndDate = "",
+    formType = ""
   }) {
     try {
       const offset = (page - 1) * limit;
@@ -83,23 +84,27 @@ class FormService {
         : null;
       let order = [];
       if (sortField && validSortOrder) {
-        if (sortField === "Park") {
+        if (sortField === "parkId") {
           order.push([{ model: Park, as: "Park" }, "title", validSortOrder]);
         } else {
           order.push([sortField, validSortOrder]);
         }
       }
       const where = {};
-      if (Array.isArray(selectedParks) && selectedParks.length > 0) {
-        where.parkId = {
-          [Op.in]: selectedParks.map((id) => {
-            return sequelize.cast(id, "uuid");
-          }), // Приведение типов
-        };
+      if (parkId) {
+        where.parkId = parkId
       }
       if (filterName) {
         where.name = {
           [Op.iLike]: `%${filterName}%`, // Регистронезависимый поиск с шаблоном
+        };
+      }
+      if (formType) {
+        where.formType = formType
+      }
+      if (phoneNumber) {
+        where.phoneNumber = {
+          [Op.iLike]: `%${phoneNumber}%`, // Регистронезависимый поиск с шаблоном
         };
       }
       if (filterStartDate || filterEndDate) {

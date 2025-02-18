@@ -6,7 +6,7 @@ router.post("/", formController.createForm);
 router.get("/:id", formController.getFormById);
 router.get("/:id/statusHistory", formController.getStatusHistoryById);
 router.get("/", formController.getAllForms);
-router.put("/:id", formController.updateForm);
-router.put("/:id/status", formController.updateFormStatus);
+router.put("/update/:id", formController.updateForm);
+router.put("/update/:id/status", formController.updateFormStatus);
 
 module.exports = router;

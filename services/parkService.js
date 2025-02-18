@@ -63,6 +63,7 @@ class ParkService {
     title = "",
     filteredCity = null,
     filteredYandexGasStation = null,
+    supportAlwaysAvailable = null
   }) {
     try {
       const offset = (page - 1) * limit;
@@ -99,6 +100,9 @@ class ParkService {
       if (filteredCity) {
         where.cityId = filteredCity;
       }
+      if (supportAlwaysAvailable) {
+        where.supportAlwaysAvailable = supportAlwaysAvailable;
+      }
       if (filteredYandexGasStation && filteredYandexGasStation !== "null") {
         where.yandexGasStation = filteredYandexGasStation;
       }
@@ -130,7 +134,15 @@ class ParkService {
 
   async updatePark(id, data) {
     try {
-      const park = await Park.findByPk(id);
+      const park = await Park.findByPk(id, {
+        include: [
+          {
+            model: City,
+            as: "City",
+            attributes: ["title", "id"],
+          },
+        ],
+      });
       if (!park) {
         throw new Error("Парк не найден.");
       }
@@ -183,6 +195,34 @@ class ParkService {
       throw new Error(`Ошибка при поиске парка по названию: ${error.message}`);
     }
   }
+
+  async saveParkImage(parkId, imageUrl) {
+    const park = await Park.findByPk(parkId);
+    if (!park) {
+      throw new Error("Парк не найден.");
+    }
+    park.imageUrl = imageUrl;
+    await park.save();
+    return park;
+  }
+
+  async deleteImage(parkId) {
+    try {
+
+      const park = await Park.findByPk(parkId);
+      if (!park || !park.imageUrl) {
+        return res.status(404).json({ message: "Изображение не найдено" });
+      }
+
+      park.imageUrl = null
+      await park.save()
+
+      return park
+    } catch (error) {
+      console.error("Ошибка при удалении изображения:", error);
+      throw new Error(`Ошибка при обновлении парка: ${error.message}`);
+    }
+  };
 }
 
 module.exports = new ParkService();

@@ -124,6 +124,34 @@ class PromotionService {
       throw new Error(`Ошибка при удалении акции: ${error.message}`);
     }
   }
+
+  async saveParkImage(promotionId, imageUrl) {
+    const promotion = await Promotion.findByPk(promotionId);
+    if (!promotion) {
+      throw new Error("Парк не найден.");
+    }
+    promotion.imageUrl = imageUrl;
+    await promotion.save();
+    return promotion;
+  }
+
+  async deleteImage(promotionId) {
+    try {
+
+      const promotion = await Promotion.findByPk(promotionId);
+      if (!promotion || !promotion.imageUrl) {
+        throw new Error(`Изображение не найдено`);
+      }
+
+      promotion.imageUrl = null
+      await promotion.save()
+
+      return promotion
+    } catch (error) {
+      console.error("Ошибка при удалении изображения:", error);
+      throw new Error(`Ошибка при обновлении парка: ${error.message}`);
+    }
+  };
 }
 
 module.exports = new PromotionService();
