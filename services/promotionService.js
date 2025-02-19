@@ -45,8 +45,15 @@ class PromotionService {
     sortOrder = null,
     parkId = null,
     title = "",
+    active = null
   }) {
     try {
+      const now = new Date();
+      await Promotion.update(
+        { active: false },
+        { where: { expires: { [Op.lt]: now }, active: true } }
+      );
+
       const offset = (page - 1) * limit;
 
       const validSortOrder = ["asc", "desc"].includes(sortOrder)
@@ -63,6 +70,9 @@ class PromotionService {
       }
 
       const where = {};
+      if (active) {
+        where.active = active;
+      }
       if (parkId && parkId !== "null") {
         where.parkId = parkId;
       }
@@ -76,7 +86,7 @@ class PromotionService {
         include: [
           {
             model: Park,
-            attributes: ["title", "id"], // Загружаем только нужные поля парка
+            attributes: ["title", "id"],
           },
         ],
         where,
@@ -103,7 +113,6 @@ class PromotionService {
         throw new Error("Акция не найдена.");
       }
 
-      // Обновляем поля акции
       await promotion.update(data);
       return promotion;
     } catch (error) {
@@ -137,21 +146,20 @@ class PromotionService {
 
   async deleteImage(promotionId) {
     try {
-
       const promotion = await Promotion.findByPk(promotionId);
       if (!promotion || !promotion.imageUrl) {
         throw new Error(`Изображение не найдено`);
       }
 
-      promotion.imageUrl = null
-      await promotion.save()
+      promotion.imageUrl = null;
+      await promotion.save();
 
-      return promotion
+      return promotion;
     } catch (error) {
       console.error("Ошибка при удалении изображения:", error);
       throw new Error(`Ошибка при обновлении парка: ${error.message}`);
     }
-  };
+  }
 }
 
 module.exports = new PromotionService();
