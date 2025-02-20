@@ -2,24 +2,23 @@ const sequelize = require("../db");
 const { DataTypes } = require("sequelize");
 
 const FormStatus = sequelize.define("FormStatus", {
-  id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
+  code: {
+    type: DataTypes.STRING,
     primaryKey: true,
     allowNull: false,
   },
-  code: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-  },
-  name: {
+  title: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  description: {
-    type: DataTypes.STRING,
+  formType: {
+    type: DataTypes.ENUM("consultation", "taxiPark"),
     allowNull: true,
+  },
+  isCommon: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
   },
 });
 

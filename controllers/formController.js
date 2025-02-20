@@ -7,8 +7,7 @@ class FormController {
 
       if (!name || !formType || !phoneNumber) {
         return res.status(400).json({
-          message:
-            "Все поля (name, parkId, formType, phoneNumber) обязательны.",
+          message: "Все поля (name,  formType, phoneNumber) обязательны.",
         });
       }
 
@@ -45,6 +44,16 @@ class FormController {
     }
   }
 
+  async getAvailableStatusesById(req, res) {
+    try {
+      const { id } = req.params;
+      const form = await formService.getAvailableStatusesById(id);
+      return res.status(200).json(form);
+    } catch (error) {
+      return res.status(404).json({ message: error.message });
+    }
+  }
+
   async getAllForms(req, res) {
     try {
       const limit = req.query.limit;
@@ -56,7 +65,7 @@ class FormController {
       const formType = req.query.formType;
       const filterStartDate = req.query.filterStartDate;
       const filterEndDate = req.query.filterEndDate;
-      const parkId = req.query.parkId
+      const parkId = req.query.parkId;
 
       const forms = await formService.getAllForms({
         limit,
@@ -68,7 +77,7 @@ class FormController {
         filterStartDate,
         filterEndDate,
         phoneNumber,
-        formType
+        formType,
       });
       return res.status(200).json(forms);
     } catch (error) {

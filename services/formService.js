@@ -6,37 +6,32 @@ const {
   FormStatusHistory,
   sequelize,
 } = require("../models/index");
+const smsCodeService = require("./smsCodeService");
+const FormStatusTransition = require("../models/FormStatusTransition");
 
 class FormService {
   async createForm({ name, parkId, formType, phoneNumber }) {
     if (formType === "taxiPark" && !parkId) {
       throw new Error("Поле parkId обязательно для типа формы 'taxiPark'");
     }
-    const transaction = await sequelize.transaction();
+
     try {
-      const form = await Form.create(
-        {
-          name,
-          parkId,
-          formType,
-          phoneNumber,
-          statusCode: "registered",
-        },
-        { transaction }
-      );
+      const form = await Form.create({
+        name,
+        parkId,
+        formType,
+        phoneNumber,
+        statusCode: "application_received",
+      });
 
-      await FormStatusHistory.create(
-        {
-          formId: form.id,
-          newStatusCode: "registered",
-        },
-        { transaction }
-      );
+      await FormStatusHistory.create({
+        formId: form.id,
+        newStatusCode: "application_received",
+      });
 
-      await transaction.commit();
+      await smsCodeService.sendOtp(form.id, phoneNumber);
       return form;
     } catch (error) {
-      await transaction.rollback();
       throw new Error(`Ошибка при создании формы: ${error.message}`);
     }
   }
@@ -55,7 +50,16 @@ class FormService {
 
   async getStatusHistoryById(id) {
     try {
-      const forms = await FormStatusHistory.findAll({ where: { formId: id } });
+      const forms = await FormStatusHistory.findAll({
+        where: { formId: id },
+        include: [
+          {
+            model: FormStatus,
+            as: "statusDetail",
+            attributes: ["code", "title"],
+          },
+        ],
+      });
       if (!forms) {
         throw new Error("Форма не найдена.");
       }
@@ -63,6 +67,24 @@ class FormService {
     } catch (error) {
       throw new Error(`Ошибка при получении формы: ${error.message}`);
     }
+  }
+
+  async getAvailableStatusesById(formId) {
+    const form = await Form.findByPk(formId);
+    if (!form) {
+      throw new Error("Форма не найдена");
+    }
+    return await FormStatusTransition.findAll({
+      where: { formType: form.formType, fromStatus: form.statusCode },
+      include: [
+        {
+          model: FormStatus,
+          as: "toStatusDetail",
+          attributes: ["code", "title"],
+        },
+      ],
+      attributes: ["toStatus", "requires_reason"],
+    });
   }
 
   async getAllForms({
@@ -75,7 +97,7 @@ class FormService {
     parkId = "",
     filterStartDate = "",
     filterEndDate = "",
-    formType = ""
+    formType = "",
   }) {
     try {
       const offset = (page - 1) * limit;
@@ -92,7 +114,7 @@ class FormService {
       }
       const where = {};
       if (parkId) {
-        where.parkId = parkId
+        where.parkId = parkId;
       }
       if (filterName) {
         where.name = {
@@ -100,7 +122,7 @@ class FormService {
         };
       }
       if (formType) {
-        where.formType = formType
+        where.formType = formType;
       }
       if (phoneNumber) {
         where.phoneNumber = {

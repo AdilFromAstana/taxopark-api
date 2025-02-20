@@ -1,21 +1,121 @@
-const City = require("./models/City");
+const FormStatus = require("./models/FormStatus");
+const FormStatusTransition = require("./models/FormStatusTransition");
 
-async function seedDatabase() {
-  const cityData = [
-    { id: "17a5888d-3586-43b4-9267-6e25a7d937ed", title: "Алматы" },
-    { id: "601148ba-80f3-495b-bfd8-59df837e62f3", title: "Шымкент" },
-    { id: "708fd4f0-de0a-4abe-bcbe-44bb63b02596", title: "Тараз" },
-    { id: "b82d6122-5999-4c44-b13f-6188f00a78d1", title: "Актобе" },
-    { id: "c8c43c86-101e-4e17-bd90-bd61cc1ddcf8", title: "Караганда" },
-    { id: "f296c37c-ef7b-4eaa-ae60-ecaca7442811", title: "Астана" },
+async function seedStatuses() {
+  const statuses = [
+    { code: "application_received", title: "Заявка поступила", isCommon: true },
+    {
+      code: "sms_sent",
+      title: "Отправлен SMS для верификации",
+      isCommon: true,
+    },
+    { code: "sms_error", title: "Ошибка при отправлении SMS", isCommon: true },
+    { code: "sms_confirmed", title: "Подтверждение SMS", isCommon: true },
+
+    {
+      code: "partner_notified",
+      title: "Партнер уведомлен",
+      formType: "taxiPark",
+    },
+    { code: "approved", title: "Подключен", formType: "consultation" },
+    {
+      code: "no_answer",
+      title: "Клиент не отвечает",
+      formType: "consultation",
+    },
+    {
+      code: "sent_to_other_park",
+      title: "Отправлен в другой парк",
+      formType: "consultation",
+    },
+    { code: "thinking", title: "Клиент думает", formType: "consultation" },
+    {
+      code: "incorrect_data",
+      title: "Неверные данные",
+      formType: "consultation",
+    },
   ];
 
-  for (const city of cityData) {
-    await City.findOrCreate({
-      where: { title: city.title },
-      defaults: city,
+  for (const status of statuses) {
+    await FormStatus.findOrCreate({
+      where: { code: status.code },
+      defaults: status,
     });
   }
+}
+
+async function seedStatusTransitions() {
+  const transitions = [];
+
+  // 1. Переходы из `application_received`
+  const initialTransitions = [
+    "sms_sent",
+    "sms_error",
+    "sms_confirmed",
+    "partner_notified",
+  ];
+  initialTransitions.forEach((toStatus) => {
+    transitions.push({
+      fromStatus: "application_received",
+      toStatus,
+      formType: null, // Доступно всем
+      requires_reason: false,
+    });
+  });
+
+  // 2. Переходы из `sms_sent`, `sms_error`, `sms_confirmed`, `partner_notified`
+  const allowedFromStatuses = [
+    "sms_sent",
+    "sms_error",
+    "sms_confirmed",
+    "partner_notified",
+  ];
+
+  // Все статусы, куда можно перейти
+  const consultationStatuses = [
+    "approved",
+    "no_answer",
+    "sent_to_other_park",
+    "thinking",
+    "incorrect_data",
+  ];
+  const taxiParkStatuses = ["partner_notified", "approved"];
+
+  allowedFromStatuses.forEach((fromStatus) => {
+    consultationStatuses.forEach((toStatus) => {
+      transitions.push({
+        fromStatus,
+        toStatus,
+        formType: "consultation",
+        requires_reason: false,
+      });
+    });
+
+    taxiParkStatuses.forEach((toStatus) => {
+      transitions.push({
+        fromStatus,
+        toStatus,
+        formType: "taxiPark",
+        requires_reason: false,
+      });
+    });
+  });
+
+  // Записываем переходы в базу
+  for (const transition of transitions) {
+    await FormStatusTransition.findOrCreate({
+      where: {
+        fromStatus: transition.fromStatus,
+        toStatus: transition.toStatus,
+      },
+      defaults: transition,
+    });
+  }
+}
+
+async function seedDatabase() {
+  await seedStatuses();
+  await seedStatusTransitions();
 }
 
 module.exports = seedDatabase;

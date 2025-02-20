@@ -6,12 +6,32 @@ const Form = require("./Form");
 const Promotion = require("./Promotion");
 const FormStatus = require("./FormStatus");
 const FormStatusHistory = require("./FormStatusHistory");
+const FormStatusTransition = require("./FormStatusTransition");
 
 Park.hasMany(Promotion, { foreignKey: "parkId" });
 Promotion.belongsTo(Park, { foreignKey: "parkId" });
+
 Park.belongsTo(City, { foreignKey: "cityId", targetKey: "id" });
 Form.belongsTo(Park, { foreignKey: "parkId", targetKey: "id" });
+
 FormStatusHistory.belongsTo(Form, { foreignKey: "formId", targetKey: "id" });
+FormStatusHistory.belongsTo(FormStatus, {
+  foreignKey: "newStatusCode",
+  targetKey: "code",
+  as: "statusDetail",
+});
+
+// Связи для статусов
+FormStatusTransition.belongsTo(FormStatus, {
+  foreignKey: "toStatus",
+  targetKey: "code",
+  as: "toStatusDetail",
+});
+FormStatusTransition.belongsTo(FormStatus, {
+  foreignKey: "fromStatus",
+  targetKey: "code",
+  as: "fromStatusDetail",
+});
 
 module.exports = {
   Park,
