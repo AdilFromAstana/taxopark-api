@@ -29,6 +29,10 @@ const FormStatusTransition = sequelize.define("FormStatusTransition", {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+  isCommon: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
 });
 
 module.exports = FormStatusTransition;

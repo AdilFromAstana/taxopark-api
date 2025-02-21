@@ -53,6 +53,11 @@ async function seedStatusTransitions() {
     "sms_error",
     "sms_confirmed",
     "partner_notified",
+    "approved",
+    "no_answer",
+    "sent_to_other_park",
+    "thinking",
+    "incorrect_data",
   ];
   initialTransitions.forEach((toStatus) => {
     transitions.push({

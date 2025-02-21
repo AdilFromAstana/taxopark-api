@@ -63,7 +63,8 @@ class ParkService {
     title = "",
     filteredCity = null,
     filteredYandexGasStation = null,
-    supportAlwaysAvailable = null
+    supportAlwaysAvailable = null,
+    active = null,
   }) {
     try {
       const offset = (page - 1) * limit;
@@ -85,6 +86,9 @@ class ParkService {
 
       if (cityId && cityId !== "null") {
         where.cityId = cityId;
+      }
+      if (active) {
+        where.active = active;
       }
 
       if (Array.isArray(parkPromotions) && parkPromotions.length > 0) {
@@ -208,21 +212,20 @@ class ParkService {
 
   async deleteImage(parkId) {
     try {
-
       const park = await Park.findByPk(parkId);
       if (!park || !park.imageUrl) {
         return res.status(404).json({ message: "Изображение не найдено" });
       }
 
-      park.imageUrl = null
-      await park.save()
+      park.imageUrl = null;
+      await park.save();
 
-      return park
+      return park;
     } catch (error) {
       console.error("Ошибка при удалении изображения:", error);
       throw new Error(`Ошибка при обновлении парка: ${error.message}`);
     }
-  };
+  }
 }
 
 module.exports = new ParkService();

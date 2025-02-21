@@ -74,6 +74,7 @@ class ParkController {
       const sortField = req.query.sortField;
       const cityId = req.query.cityId;
       const title = req.query.title;
+      const active = req.query.active;
       const filteredCity = req.query.filteredCity;
       const supportAlwaysAvailable = req.query.supportAlwaysAvailable;
       const filteredYandexGasStation = req.query.filteredYandexGasStation;
@@ -91,7 +92,8 @@ class ParkController {
         title,
         filteredCity,
         filteredYandexGasStation,
-        supportAlwaysAvailable
+        supportAlwaysAvailable,
+        active,
       });
       return res.status(200).json(parks);
     } catch (error) {
@@ -156,7 +158,7 @@ class ParkController {
   async getByName(req, res) {
     try {
       const { title } = req.query; // Используем query-параметр вместо req.params
-      console.log("title: ", title)
+      console.log("title: ", title);
 
       if (!title) {
         return res.status(400).json({ message: "Название парка не указано." });
@@ -169,7 +171,6 @@ class ParkController {
       return res.status(500).json({ message: error.message });
     }
   }
-
 }
 
 module.exports = new ParkController();

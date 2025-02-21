@@ -74,8 +74,17 @@ class FormService {
     if (!form) {
       throw new Error("Форма не найдена");
     }
+    console.log("form.formType: ", form.formType);
+    console.log("form.statusCode: ", form.statusCode);
     return await FormStatusTransition.findAll({
-      where: { formType: form.formType, fromStatus: form.statusCode },
+      where: {
+        [Op.or]: [
+          { formType: form.formType }, // Совпадение formType
+          { formType: null }, // Совпадение formType
+          { isCommon: { [Op.is]: true } }, // Все, где isCommon = true, независимо от formType
+        ],
+        fromStatus: form.statusCode, // Фильтр по fromStatus
+      },
       include: [
         {
           model: FormStatus,

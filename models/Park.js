@@ -53,6 +53,10 @@ const Park = sequelize.define("Park", {
       min: 0,
     },
   },
+  carRentals: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
+  },
 });
 
 module.exports = Park;
