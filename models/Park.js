@@ -44,6 +44,11 @@ const Park = sequelize.define("Park", {
   active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
   rating: { type: DataTypes.DECIMAL, allowNull: true },
   cityId: { type: DataTypes.UUID, allowNull: false },
+  cityIds: { 
+    type: DataTypes.ARRAY(DataTypes.UUID), 
+    allowNull: false, 
+    defaultValue: [] 
+  },
   title: { type: DataTypes.STRING, allowNull: false },
   averageCheck: {
     type: DataTypes.INTEGER,

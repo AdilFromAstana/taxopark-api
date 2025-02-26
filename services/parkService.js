@@ -59,6 +59,7 @@ class ParkService {
     sortField = null,
     sortOrder = null,
     cityId = null,
+    cityIds = [],
     parkPromotions = [],
     title = "",
     filteredCity = null,
@@ -84,9 +85,10 @@ class ParkService {
 
       const where = {};
 
-      if (cityId && cityId !== "null") {
-        where.cityId = cityId;
+      if (cityIds && Array.isArray(cityIds) && cityIds.length > 0) {
+        where.cityIds = { [Op.overlap]: cityIds }; // Найдет парки, у которых хотя бы один ID совпадает
       }
+
       if (active) {
         where.active = active;
       }
@@ -115,8 +117,12 @@ class ParkService {
         include: [
           {
             model: City,
-            as: "City",
+            as: "Cities",
             attributes: ["title", "id"],
+            required: false,
+            where: {
+              id: { [Op.overlap]: sequelize.col("Park.cityIds") }, // Фильтруем по массиву cityIds
+            },
           },
         ],
         where,

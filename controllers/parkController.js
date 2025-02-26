@@ -73,6 +73,7 @@ class ParkController {
       const sortOrder = req.query.sortOrder;
       const sortField = req.query.sortField;
       const cityId = req.query.cityId;
+      const cityIds = req.query.cityIds;
       const title = req.query.title;
       const active = req.query.active;
       const filteredCity = req.query.filteredCity;
@@ -88,6 +89,7 @@ class ParkController {
         sortField,
         sortOrder,
         cityId,
+        cityIds,
         parkPromotions,
         title,
         filteredCity,
