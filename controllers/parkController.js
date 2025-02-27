@@ -44,7 +44,7 @@ class ParkController {
   async createPark(req, res) {
     try {
       const data = req.body;
-      if (!data.title || !data.cityId) {
+      if (!data.title || !data.cityIds) {
         return res
           .status(400)
           .json({ message: "Название и идентификатор города обязательны." });
@@ -72,11 +72,9 @@ class ParkController {
       const page = req.query.page;
       const sortOrder = req.query.sortOrder;
       const sortField = req.query.sortField;
-      const cityId = req.query.cityId;
       const cityIds = req.query.cityIds;
       const title = req.query.title;
       const active = req.query.active;
-      const filteredCity = req.query.filteredCity;
       const supportAlwaysAvailable = req.query.supportAlwaysAvailable;
       const filteredYandexGasStation = req.query.filteredYandexGasStation;
       const parkPromotions = req.query.parkPromotions
@@ -88,11 +86,9 @@ class ParkController {
         page,
         sortField,
         sortOrder,
-        cityId,
         cityIds,
         parkPromotions,
         title,
-        filteredCity,
         filteredYandexGasStation,
         supportAlwaysAvailable,
         active,

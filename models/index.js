@@ -11,24 +11,10 @@ const FormStatusTransition = require("./FormStatusTransition");
 Park.hasMany(Promotion, { foreignKey: "parkId" });
 Promotion.belongsTo(Park, { foreignKey: "parkId" });
 
-// Связь "Многие ко многим" для Park и City через cityIds
-Park.belongsToMany(City, {
-  through: "ParkCities", // Промежуточная таблица
-  foreignKey: "parkId",
-  otherKey: "cityId",
-  as: "Cities",
-});
-
-City.belongsToMany(Park, {
-  through: "ParkCities",
-  foreignKey: "cityId",
-  otherKey: "parkId",
-  as: "Parks",
-});
-
-Park.belongsTo(City, { foreignKey: "cityId", targetKey: "id" });
+// Связь форм с парками
 Form.belongsTo(Park, { foreignKey: "parkId", targetKey: "id" });
 
+// История статусов форм
 FormStatusHistory.belongsTo(Form, { foreignKey: "formId", targetKey: "id" });
 FormStatusHistory.belongsTo(FormStatus, {
   foreignKey: "newStatusCode",
@@ -36,6 +22,7 @@ FormStatusHistory.belongsTo(FormStatus, {
   as: "statusDetail",
 });
 
+// Переходы статусов
 FormStatusTransition.belongsTo(FormStatus, {
   foreignKey: "toStatus",
   targetKey: "code",

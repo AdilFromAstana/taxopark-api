@@ -58,73 +58,35 @@ class ParkService {
     limit = 10,
     sortField = null,
     sortOrder = null,
-    cityId = null,
     cityIds = [],
     parkPromotions = [],
     title = "",
-    filteredCity = null,
     filteredYandexGasStation = null,
     supportAlwaysAvailable = null,
     active = null,
   }) {
     try {
       const offset = (page - 1) * limit;
+      const order =
+        sortField && ["asc", "desc"].includes(sortOrder)
+          ? [[sortField, sortOrder]]
+          : [];
 
-      const validSortOrder = ["asc", "desc"].includes(sortOrder)
-        ? sortOrder
-        : null;
+      const where = {
+        ...(cityIds.length > 0 && { cityIds: { [Op.overlap]: cityIds } }),
+        ...(active !== null && { active }),
+        ...(parkPromotions.length > 0 && {
+          parkPromotions: { [Op.contains]: parkPromotions },
+        }),
+        ...(title && { title: { [Op.iLike]: `%${title}%` } }),
+        ...(filteredYandexGasStation !== null && {
+          yandexGasStation: filteredYandexGasStation,
+        }),
+        ...(supportAlwaysAvailable !== null && { supportAlwaysAvailable }),
+      };
 
-      let order = [];
-      if (sortField && validSortOrder) {
-        if (sortField === "City") {
-          order.push([{ model: City, as: "City" }, "title", validSortOrder]);
-        } else {
-          order.push([sortField, validSortOrder]);
-        }
-      }
-
-      const where = {};
-
-      if (cityIds && Array.isArray(cityIds) && cityIds.length > 0) {
-        where.cityIds = { [Op.overlap]: cityIds }; // Найдет парки, у которых хотя бы один ID совпадает
-      }
-
-      if (active) {
-        where.active = active;
-      }
-
-      if (Array.isArray(parkPromotions) && parkPromotions.length > 0) {
-        where.parkPromotions = {
-          [Op.contains]: parkPromotions,
-        };
-      }
-      if (title) {
-        where.title = {
-          [Op.iLike]: `%${title}%`,
-        };
-      }
-      if (filteredCity) {
-        where.cityId = filteredCity;
-      }
-      if (supportAlwaysAvailable) {
-        where.supportAlwaysAvailable = supportAlwaysAvailable;
-      }
-      if (filteredYandexGasStation && filteredYandexGasStation !== "null") {
-        where.yandexGasStation = filteredYandexGasStation;
-      }
-
+      // Запрашиваем парки
       const { rows: data, count: total } = await Park.findAndCountAll({
-        include: [
-          {
-            model: City,
-            as: "Cities",
-            attributes: ["title", "id"],
-            required: false,
-            where: {
-              id: { [Op.overlap]: sequelize.col("Park.cityIds") }, // Фильтруем по массиву cityIds
-            },
-          },
-        ],
         where,
         limit,
         offset,
@@ -143,22 +105,26 @@ class ParkService {
   }
 
   async updatePark(id, data) {
+    console.log("data: ", data);
     try {
       const park = await Park.findByPk(id, {
         include: [
           {
             model: City,
-            as: "City",
+            as: "Cities",
             attributes: ["title", "id"],
           },
         ],
       });
+
       if (!park) {
         throw new Error("Парк не найден.");
       }
+
       if (!data) {
         throw new Error("Передан некорректный объект данных");
       }
+
       const supportStartWorkTime =
         Array.isArray(data.supportWorkTime) && data.supportWorkTime.length > 0
           ? data.supportWorkTime[0]
@@ -168,12 +134,20 @@ class ParkService {
         Array.isArray(data.supportWorkTime) && data.supportWorkTime.length > 1
           ? data.supportWorkTime[1]
           : null;
+
       if (data.supportAlwaysAvailable === false) {
         if (!supportStartWorkTime || !supportEndWorkTime) {
           throw new Error(
             "Для парков без круглосуточной поддержки необходимо указать рабочее время (начало и конец)."
           );
         }
+      }
+
+      if (data.cityIds) {
+        if (!Array.isArray(data.cityIds)) {
+          throw new Error("cityIds должен быть массивом UUID.");
+        }
+        park.cityIds = [...new Set(data.cityIds)]; // Убираем дубликаты
       }
 
       Object.assign(park, {
