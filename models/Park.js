@@ -11,7 +11,7 @@ const Park = sequelize.define("Park", {
   parkEntrepreneurSupport: { type: DataTypes.BOOLEAN, allowNull: true },
   entrepreneurSupport: { type: DataTypes.BOOLEAN, allowNull: true },
   commissionWithdraw: { type: DataTypes.DECIMAL, allowNull: true },
-  transferPaymentCommission: { type: DataTypes.DECIMAL, allowNull: true },
+  transferPaymentCommission: { type: DataTypes.STRING, allowNull: true },
   accountantSupport: { type: DataTypes.BOOLEAN, allowNull: true },
   yandexGasStation: { type: DataTypes.BOOLEAN, allowNull: true },
   supportStartWorkTime: { type: DataTypes.STRING, allowNull: true },
@@ -68,6 +68,16 @@ const Park = sequelize.define("Park", {
     type: DataTypes.JSONB,
     allowNull: true,
     defaultValue: [],
+  },
+  averageCheckPerCity: {
+    type: DataTypes.JSONB,
+    allowNull: true,
+    defaultValue: [],
+  },
+  priority: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: -1,
   },
 });
 
