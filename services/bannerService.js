@@ -31,13 +31,14 @@ class BannerService {
 
   async deleteBanner(bannerId) {
     try {
-      const banner = await Banner.findByPk(bannerId);
+      console.log("bannerId: ", bannerId);
+      const banner = await Banner.findOne({ where: { bannerUrl: bannerId } });
+      console.log("banner: ", banner);
       if (!banner || !banner.bannerUrl) {
-        return res.status(404).json({ message: "Изображение не найдено" });
+        throw new Error(`Изображение не найдено`);
       }
 
-      banner.bannerUrl = null;
-      await banner.save();
+      await banner.destroy();
 
       return banner;
     } catch (error) {

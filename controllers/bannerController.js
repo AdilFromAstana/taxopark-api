@@ -141,7 +141,8 @@ class BannerController {
       if (!req.params.id) {
         return res.status(400).json({ message: "Файл не найден." });
       }
-      const banner = await bannerService.deleteImage(req.params.id);
+      console.log("req.params: ", req.params);
+      const banner = await bannerService.deleteBanner(req.params.id);
 
       return res.status(200).json(banner);
     } catch (error) {
