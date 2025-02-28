@@ -31,6 +31,7 @@ class CityService {
   // Получение всех городов
   async getAllCities() {
     try {
+      console.log("REQ")
       const cities = await City.findAll();
       return cities;
     } catch (error) {

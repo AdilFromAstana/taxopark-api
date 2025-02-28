@@ -19,7 +19,9 @@ const formRoutes = require("./routes/formRoutes");
 const cityRoutes = require("./routes/cityRoutes");
 const promotionRoutes = require("./routes/promotionRoutes");
 const smsCodeRouter = require("./routes/smsCodeRouter");
+const bannerRoutes = require("./routes/bannerRoutes");
 
+app.use("/banners", bannerRoutes);
 app.use("/cities", cityRoutes);
 app.use("/promotions", promotionRoutes);
 app.use("/forms", formRoutes);

@@ -7,6 +7,7 @@ const Promotion = require("./Promotion");
 const FormStatus = require("./FormStatus");
 const FormStatusHistory = require("./FormStatusHistory");
 const FormStatusTransition = require("./FormStatusTransition");
+const Banner = require("./Banner");
 
 Park.hasMany(Promotion, { foreignKey: "parkId" });
 Promotion.belongsTo(Park, { foreignKey: "parkId" });
@@ -41,5 +42,7 @@ module.exports = {
   FormStatus,
   FormStatusHistory,
   Promotion,
+  FormStatusTransition,
+  Banner,
   sequelize,
 };

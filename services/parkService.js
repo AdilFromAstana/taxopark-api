@@ -92,7 +92,6 @@ class ParkService {
         offset,
         order,
       });
-
       return {
         data,
         total,
@@ -105,17 +104,8 @@ class ParkService {
   }
 
   async updatePark(id, data) {
-    console.log("data: ", data);
     try {
-      const park = await Park.findByPk(id, {
-        include: [
-          {
-            model: City,
-            as: "Cities",
-            attributes: ["title", "id"],
-          },
-        ],
-      });
+      const park = await Park.findByPk(id);
 
       if (!park) {
         throw new Error("Парк не найден.");

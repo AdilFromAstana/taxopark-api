@@ -1,9 +1,9 @@
-const promotionService = require("../services/promotionService");
+const bannerService = require("../services/bannerService");
 const multer = require("multer");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
+const { Banner } = require("../models");
 const fs = require("fs");
-const { Promotion } = require("../models");
 
 const allowedMimeTypes = ["image/png", "image/jpeg", "image/gif", "image/webp"];
 
@@ -40,70 +40,40 @@ const upload = multer({
   },
 });
 
-class PromotionController {
-  async createPromotion(req, res) {
-    try {
-      const { title, description, expires, parkId } = req.body;
-      if (!title || !description || !parkId) {
-        return res
-          .status(400)
-          .json({ message: "Все обязательные поля должны быть заполнены." });
-      }
-
-      const promotion = await promotionService.createPromotion({
-        title,
-        description,
-        expires,
-        parkId,
-      });
-      return res.status(201).json(promotion);
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
-    }
-  }
-
-  async getPromotionById(req, res) {
-    try {
-      const { id } = req.params;
-      const promotion = await promotionService.getPromotionById(id);
-      return res.status(200).json(promotion);
-    } catch (error) {
-      return res.status(404).json({ message: error.message });
-    }
-  }
-
-  async getAllPromotions(req, res) {
+class BannerController {
+  async getAllBanners(req, res) {
     try {
       const limit = req.query.limit;
       const page = req.query.page;
-      const sortOrder = req.query.sortOrder;
-      const sortField = req.query.sortField;
-      const parkId = req.query.parkId;
-      const title = req.query.title;
-      const active = req.query.active;
 
-      const promotions = await promotionService.getAllPromotions({
+      const banners = await bannerService.getAllBanners({
         limit,
         page,
-        sortOrder,
-        sortField,
-        parkId,
-        title,
-        active,
       });
-      return res.status(200).json(promotions);
+      return res.status(200).json(banners);
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
   }
 
-  async updatePromotion(req, res) {
+  async createBanner(req, res) {
     try {
-      const { id } = req.params;
-      const data = req.body;
+      upload.single("file")(req, res, async (err) => {
+        if (err) {
+          return res.status(400).json({ message: err.message });
+        }
+        if (!req.file) {
+          return res
+            .status(400)
+            .json({ message: "Файл изображения не загружен." });
+        }
 
-      const promotion = await promotionService.updatePromotion(id, data);
-      return res.status(200).json(promotion);
+        const newBanner = await Banner.create({
+          bannerUrl: req.file.filename, // Сохраняем имя файла
+        });
+
+        return res.status(201).json(newBanner);
+      });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
@@ -124,16 +94,43 @@ class PromotionController {
           return res.status(400).json({ message: "ID парка не передан." });
         }
 
-        const promotion = await Promotion.findByPk(req.params.id);
-        if (!promotion) {
+        const banner = await Banner.findByPk(req.params.id);
+        if (!banner) {
           return res.status(404).json({ message: "Парк не найден." });
         }
 
-        promotion.imageUrl = uniqueFilename;
-        await promotion.save();
+        banner.bannerUrl = uniqueFilename;
+        await banner.save();
 
         return res.status(200).json(uniqueFilename);
       });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  }
+
+  async updateBannerStatus(req, res) {
+    try {
+      const { id } = req.params;
+      const { isActive } = req.body; // Ожидаем `true` или `false`
+
+      if (isActive === undefined) {
+        return res
+          .status(400)
+          .json({ message: "Статус (isActive) обязателен." });
+      }
+
+      const banner = await Banner.findByPk(id);
+      if (!banner) {
+        return res.status(404).json({ message: "Баннер не найден." });
+      }
+
+      banner.isActive = isActive; // Обновляем статус
+      await banner.save();
+
+      return res
+        .status(200)
+        .json({ message: "Статус баннера обновлен.", banner });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
@@ -144,23 +141,13 @@ class PromotionController {
       if (!req.params.id) {
         return res.status(400).json({ message: "Файл не найден." });
       }
-      const park = await promotionService.deleteImage(req.params.id);
+      const banner = await bannerService.deleteImage(req.params.id);
 
-      return res.status(200).json(park);
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
-    }
-  }
-
-  async deletePromotion(req, res) {
-    try {
-      const { id } = req.params;
-      await promotionService.deletePromotion(id);
-      return res.status(200).json({ message: "Акция успешно удалена." });
+      return res.status(200).json(banner);
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
   }
 }
 
-module.exports = new PromotionController();
+module.exports = new BannerController();

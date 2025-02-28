@@ -43,7 +43,9 @@ const Park = sequelize.define("Park", {
   imageUrl: { type: DataTypes.STRING, allowNull: true },
   active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
   rating: { type: DataTypes.DECIMAL, allowNull: true },
-  email: { type: DataTypes.STRING, allowNull: true },
+  email: { type: DataTypes.STRING, allowNull: true, unique: true },
+  isPartner: { type: DataTypes.BOOLEAN, allowNull: true },
+  additionalInfo: { type: DataTypes.TEXT, allowNull: true },
   cityIds: {
     type: DataTypes.ARRAY(DataTypes.UUID),
     allowNull: false,
@@ -61,6 +63,11 @@ const Park = sequelize.define("Park", {
   carRentals: {
     type: DataTypes.BOOLEAN,
     allowNull: true,
+  },
+  commissionRates: {
+    type: DataTypes.JSONB,
+    allowNull: true,
+    defaultValue: [],
   },
 });
 
