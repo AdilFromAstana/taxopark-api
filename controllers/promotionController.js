@@ -81,6 +81,7 @@ class PromotionController {
       const parkId = req.query.parkId;
       const title = req.query.title;
       const active = req.query.active;
+      const highPriority = req.query.highPriority;
 
       const promotions = await promotionService.getAllPromotions({
         limit,
@@ -90,6 +91,7 @@ class PromotionController {
         parkId,
         title,
         active,
+        highPriority,
       });
       return res.status(200).json(promotions);
     } catch (error) {

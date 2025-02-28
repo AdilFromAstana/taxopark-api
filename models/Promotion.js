@@ -33,9 +33,10 @@ const Promotion = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    imageUrl: {
-      type: DataTypes.STRING,
-      allowNull: true,
+    highPriority: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
   },
   {

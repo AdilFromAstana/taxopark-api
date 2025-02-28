@@ -43,7 +43,7 @@ const Park = sequelize.define("Park", {
   imageUrl: { type: DataTypes.STRING, allowNull: true },
   active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
   rating: { type: DataTypes.DECIMAL, allowNull: true },
-  email: { type: DataTypes.STRING, allowNull: true, unique: true },
+  email: { type: DataTypes.STRING, allowNull: true, unique: false },
   isPartner: { type: DataTypes.BOOLEAN, allowNull: true },
   additionalInfo: { type: DataTypes.TEXT, allowNull: true },
   cityIds: {

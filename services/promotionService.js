@@ -45,7 +45,8 @@ class PromotionService {
     sortOrder = null,
     parkId = null,
     title = "",
-    active = null
+    active = null,
+    highPriority = null
   }) {
     try {
       const now = new Date();
@@ -75,6 +76,9 @@ class PromotionService {
       }
       if (parkId && parkId !== "null") {
         where.parkId = parkId;
+      }
+      if (highPriority && highPriority !== "null") {
+        where.highPriority = highPriority;
       }
       if (title) {
         where.title = {
