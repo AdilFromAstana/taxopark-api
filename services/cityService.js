@@ -31,8 +31,9 @@ class CityService {
   // Получение всех городов
   async getAllCities() {
     try {
-      console.log("REQ")
-      const cities = await City.findAll();
+      const cities = await City.findAll({
+        order: [["title", "ASC"]],
+      });
       return cities;
     } catch (error) {
       throw new Error(`Ошибка при получении списка городов: ${error.message}`);

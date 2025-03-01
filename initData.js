@@ -1,3 +1,4 @@
+const { Park } = require("./models");
 const FormStatus = require("./models/FormStatus");
 const FormStatusTransition = require("./models/FormStatusTransition");
 
@@ -118,7 +119,38 @@ async function seedStatusTransitions() {
   }
 }
 
+async function updateAverageCheckForAllParks() {
+  try {
+    const parks = await Park.findAll({
+      attributes: ["id", "cityIds", "averageCheckPerCity"],
+    });
+
+    for (const park of parks) {
+      const { id, cityIds, averageCheckPerCity } = park;
+
+      // Проверяем, что cityIds - массив и не пустой, а также averageCheckPerCity пустой
+      if (Array.isArray(cityIds) && cityIds.length > 0 && (!averageCheckPerCity || averageCheckPerCity.length === 0)) {
+        const averageCheckArray = cityIds.map((cityId) => ({
+          cityId,
+          averageCheck: 1000,
+        }));
+
+        await Park.update(
+          { averageCheckPerCity: averageCheckArray },
+          { where: { id } }
+        );
+      }
+    }
+
+    console.log("Все записи успешно обновлены!");
+  } catch (error) {
+    console.error("Ошибка при массовом обновлении averageCheckPerCity:", error);
+  }
+}
+
+
 async function seedDatabase() {
+  await updateAverageCheckForAllParks();
   await seedStatuses();
   await seedStatusTransitions();
 }

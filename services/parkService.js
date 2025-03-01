@@ -66,6 +66,10 @@ class ParkService {
     active = null,
   }) {
     try {
+      if (!Array.isArray(cityIds) && cityIds !== "") {
+        cityIds = [cityIds];
+      }
+
       const offset = (page - 1) * limit;
       const order =
         sortField && ["asc", "desc"].includes(sortOrder)
