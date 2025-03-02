@@ -14,6 +14,7 @@ console.log("path.join(__dirname, ../uploads)): ", path.join(__dirname, "../uplo
 
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
+const reviewRoutes = require("./routes/reviewRoutes");
 const parkRoutes = require("./routes/parkRoutes");
 const formRoutes = require("./routes/formRoutes");
 const cityRoutes = require("./routes/cityRoutes");
@@ -21,6 +22,7 @@ const promotionRoutes = require("./routes/promotionRoutes");
 const smsCodeRouter = require("./routes/smsCodeRouter");
 const bannerRoutes = require("./routes/bannerRoutes");
 
+app.use("/reviews", reviewRoutes);
 app.use("/banners", bannerRoutes);
 app.use("/cities", cityRoutes);
 app.use("/promotions", promotionRoutes);

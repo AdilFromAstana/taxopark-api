@@ -157,23 +157,6 @@ class ParkService {
     }
   }
 
-  async getByName(title) {
-    try {
-      const parks = await Park.findAll({
-        where: {
-          title: {
-            [Op.iLike]: `%${title}%`,
-          },
-        },
-        limit: 10,
-      });
-
-      return parks;
-    } catch (error) {
-      throw new Error(`Ошибка при поиске парка по названию: ${error.message}`);
-    }
-  }
-
   async saveParkImage(parkId, imageUrl) {
     const park = await Park.findByPk(parkId);
     if (!park) {
