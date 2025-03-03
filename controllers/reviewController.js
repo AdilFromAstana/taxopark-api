@@ -78,6 +78,7 @@ class ReviewController {
       const sortField = req.query.sortField;
       const reviewId = req.query.reviewId;
       const name = req.query.name;
+      const active = req.query.active;
 
       const reviews = await reviewService.getAllReviews({
         limit,
@@ -86,6 +87,7 @@ class ReviewController {
         sortField,
         reviewId,
         name,
+        active,
       });
       return res.status(200).json(reviews);
     } catch (error) {

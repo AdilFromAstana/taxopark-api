@@ -33,12 +33,9 @@ class ReviewService {
     sortField = null,
     sortOrder = null,
     name = "",
+    active = null,
   }) {
     try {
-      if (!Array.isArray(cityIds) && cityIds !== "") {
-        cityIds = [cityIds];
-      }
-
       const offset = (page - 1) * limit;
       const order =
         sortField && ["asc", "desc"].includes(sortOrder)
@@ -47,6 +44,7 @@ class ReviewService {
 
       const where = {
         ...(name && { title: { [Op.iLike]: `%${title}%` } }),
+        ...(active && { active }),
       };
 
       const { rows: data, count: total } = await Review.findAndCountAll({

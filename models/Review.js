@@ -11,6 +11,7 @@ const Review = sequelize.define("Review", {
   name: { type: DataTypes.STRING, allowNull: false },
   imageUrl: { type: DataTypes.STRING, allowNull: true },
   description: { type: DataTypes.STRING, allowNull: false },
+  active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 });
 
 module.exports = Review;
