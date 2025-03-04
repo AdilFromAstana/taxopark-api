@@ -76,8 +76,8 @@ const Park = sequelize.define("Park", {
   },
   priority: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: -1,
+    allowNull: true,
+    defaultValue: null,
   },
 });
 

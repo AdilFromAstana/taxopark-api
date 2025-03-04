@@ -8,5 +8,6 @@ router.get("/", parkController.getAllParks);
 router.put("/update/:id", parkController.updatePark);
 router.post("/uploadImage/:id", parkController.uploadImage);
 router.delete("/deleteImage/:id", parkController.deleteImage);
+router.put("/updatePriorities", parkController.updatePriorities);
 
 module.exports = router;

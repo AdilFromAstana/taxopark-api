@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Park, City } = require("../models/index");
+const { Park } = require("../models/index");
 
 class ParkService {
   async createPark(data) {
@@ -181,6 +181,37 @@ class ParkService {
     } catch (error) {
       console.error("Ошибка при удалении изображения:", error);
       throw new Error(`Ошибка при обновлении парка: ${error.message}`);
+    }
+  }
+
+  async updatePriorities(priorityData) {
+    if (!Array.isArray(priorityData) || priorityData.length === 0) {
+      throw new Error("Передан некорректный массив данных");
+    }
+
+    try {
+      const transaction = await Park.sequelize.transaction();
+
+      try {
+        for (const { id, priority } of priorityData) {
+          await Park.update(
+            { priority },
+            {
+              where: { id },
+              transaction,
+            }
+          );
+        }
+
+        await transaction.commit();
+
+        return { message: "Приоритеты успешно обновлены" };
+      } catch (error) {
+        await transaction.rollback();
+        throw new Error(`Ошибка при обновлении приоритетов: ${error.message}`);
+      }
+    } catch (error) {
+      throw new Error(`Ошибка при обновлении парков: ${error.message}`);
     }
   }
 }
