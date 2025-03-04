@@ -33,10 +33,10 @@ const Promotion = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    highPriority: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
+    priority: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: null,
     },
   },
   {

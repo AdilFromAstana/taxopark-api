@@ -163,6 +163,21 @@ class PromotionController {
       return res.status(500).json({ message: error.message });
     }
   }
+
+  async updatePriorities(req, res) {
+    try {
+      const priorityData = req.body;
+
+      if (!Array.isArray(priorityData) || priorityData.length === 0) {
+        return res.status(400).json({ message: "Некорректные данные" });
+      }
+
+      const result = await promotionService.updatePriorities(priorityData);
+      return res.status(200).json(result);
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  }
 }
 
 module.exports = new PromotionController();

@@ -9,5 +9,6 @@ router.put("/update/:id", reviewController.updateReview);
 router.post("/uploadImage/:id", reviewController.uploadImage);
 router.delete("/deleteImage/:id", reviewController.deleteImage);
 router.delete("/:id", reviewController.deleteReview);
+router.put("/updatePriorities", reviewController.updatePriorities);
 
 module.exports = router;

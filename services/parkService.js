@@ -185,7 +185,7 @@ class ParkService {
   }
 
   async updatePriorities(priorityData) {
-    if (!Array.isArray(priorityData) || priorityData.length === 0) {
+    if (!Array.isArray(priorityData)) {
       throw new Error("Передан некорректный массив данных");
     }
 
@@ -193,6 +193,12 @@ class ParkService {
       const transaction = await Park.sequelize.transaction();
 
       try {
+        const existingRecords = await Park.findAll({ transaction });
+        const existingIds = new Set(existingRecords.map((record) => record.id));
+        const newIds = new Set(priorityData.map(({ id }) => id));
+
+        const idsToDelete = [...existingIds].filter((id) => !newIds.has(id));
+
         for (const { id, priority } of priorityData) {
           await Park.update(
             { priority },
@@ -203,8 +209,18 @@ class ParkService {
           );
         }
 
-        await transaction.commit();
+        // Устанавливаем -1 для отсутствующих записей
+        if (idsToDelete.length > 0) {
+          await Park.update(
+            { priority: -1 },
+            {
+              where: { id: idsToDelete },
+              transaction,
+            }
+          );
+        }
 
+        await transaction.commit();
         return { message: "Приоритеты успешно обновлены" };
       } catch (error) {
         await transaction.rollback();
