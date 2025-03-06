@@ -216,7 +216,6 @@ class ParkService {
           );
         }
 
-        // Устанавливаем -1 для отсутствующих записей
         if (idsToDelete.length > 0) {
           await Park.update(
             { priority: null },
