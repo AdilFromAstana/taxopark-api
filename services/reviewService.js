@@ -137,7 +137,7 @@ class ReviewService {
 
         if (idsToDelete.length > 0) {
           await Review.update(
-            { priority: -1 },
+            { priority: null },
             {
               where: { id: idsToDelete },
               transaction,

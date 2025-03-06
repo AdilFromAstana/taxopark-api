@@ -192,7 +192,7 @@ class PromotionService {
 
         if (idsToDelete.length > 0) {
           await Promotion.update(
-            { priority: -1 },
+            { priority: null },
             {
               where: { id: idsToDelete },
               transaction,

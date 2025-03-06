@@ -77,7 +77,6 @@ class ParkService {
           : [];
 
       const where = {
-        ...(cityIds.length > 0 && { cityIds: { [Op.overlap]: cityIds } }),
         ...(active !== null && { active }),
         ...(parkPromotions.length > 0 && {
           parkPromotions: { [Op.contains]: parkPromotions },
@@ -88,6 +87,14 @@ class ParkService {
         }),
         ...(supportAlwaysAvailable !== null && { supportAlwaysAvailable }),
       };
+
+      if (cityIds.length > 0) {
+        where.averageCheckPerCity = {
+          [Op.or]: cityIds.map((cityId) => ({
+            [Op.contains]: [{ cityId }],
+          })),
+        };
+      }
 
       // Запрашиваем парки
       const { rows: data, count: total } = await Park.findAndCountAll({
@@ -212,7 +219,7 @@ class ParkService {
         // Устанавливаем -1 для отсутствующих записей
         if (idsToDelete.length > 0) {
           await Park.update(
-            { priority: -1 },
+            { priority: null },
             {
               where: { id: idsToDelete },
               transaction,
