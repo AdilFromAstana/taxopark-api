@@ -1,5 +1,6 @@
 const sequelize = require("../db");
 
+const User = require("./User");
 const City = require("./City");
 const Park = require("./Park");
 const Form = require("./Form");
@@ -46,5 +47,6 @@ module.exports = {
   FormStatusTransition,
   Banner,
   Review,
+  User,
   sequelize,
 };

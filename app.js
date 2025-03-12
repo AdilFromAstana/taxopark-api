@@ -10,18 +10,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
-console.log("path.join(__dirname, ../uploads)): ", path.join(__dirname, "../uploads/1739817563720.jpg"))
-
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-const reviewRoutes = require("./routes/reviewRoutes");
 const parkRoutes = require("./routes/parkRoutes");
 const formRoutes = require("./routes/formRoutes");
 const cityRoutes = require("./routes/cityRoutes");
-const promotionRoutes = require("./routes/promotionRoutes");
-const smsCodeRouter = require("./routes/smsCodeRouter");
+const authRoutes = require("./routes/authRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 const bannerRoutes = require("./routes/bannerRoutes");
+const smsCodeRouter = require("./routes/smsCodeRouter");
+const promotionRoutes = require("./routes/promotionRoutes");
 
+app.use("/users", authRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/banners", bannerRoutes);
 app.use("/cities", cityRoutes);

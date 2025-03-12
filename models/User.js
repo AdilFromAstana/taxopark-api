@@ -8,16 +8,44 @@ const User = sequelize.define("User", {
     primaryKey: true,
     allowNull: false,
   },
-  firstName: { type: DataTypes.STRING, allowNull: false },
-  lastName: { type: DataTypes.STRING, allowNull: false },
-  email: { type: DataTypes.STRING, allowNull: true, unique: true },
+  name: { type: DataTypes.STRING, allowNull: false },
+  userName: { type: DataTypes.STRING, allowNull: false, unique: true },
   password: { type: DataTypes.STRING, allowNull: false },
-  role: {
-    type: DataTypes.ENUM("user", "admin"),
-    defaultValue: "user",
+  // roles: {
+  //   type: DataTypes.ARRAY(DataTypes.STRING),
+  //   allowNull: false,
+  //   validate: {
+  //     isValidRole(value) {
+  //       const allowedRoles = ["manager", "admin"];
+  //       if (
+  //         !Array.isArray(value) ||
+  //         value.some((role) => !allowedRoles.includes(role))
+  //       ) {
+  //         throw new Error(
+  //           "Роли должны быть массивом, содержащим 'manager' или 'admin'"
+  //         );
+  //       }
+  //     },
+  //   },
+  // },
+  roles: {
+    type: DataTypes.JSON, // Используем JSON вместо ARRAY
     allowNull: false,
+    defaultValue: [],
+    validate: {
+      isValidRole(value) {
+        const allowedRoles = ["manager", "admin"];
+        if (
+          !Array.isArray(value) ||
+          value.some((role) => !allowedRoles.includes(role))
+        ) {
+          throw new Error(
+            "Роли должны быть массивом, содержащим 'manager' или 'admin'"
+          );
+        }
+      },
+    },
   },
-  isActive: { type: DataTypes.BOOLEAN, defaultValue: true },
 });
 
 module.exports = User;

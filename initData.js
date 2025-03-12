@@ -1,6 +1,7 @@
-const { Park } = require("./models");
+const { Park, User } = require("./models");
 const FormStatus = require("./models/FormStatus");
 const FormStatusTransition = require("./models/FormStatusTransition");
+const crypto = require("crypto");
 
 async function seedStatuses() {
   const statuses = [
@@ -129,7 +130,11 @@ async function updateAverageCheckForAllParks() {
       const { id, cityIds, averageCheckPerCity } = park;
 
       // Проверяем, что cityIds - массив и не пустой, а также averageCheckPerCity пустой
-      if (Array.isArray(cityIds) && cityIds.length > 0 && (!averageCheckPerCity || averageCheckPerCity.length === 0)) {
+      if (
+        Array.isArray(cityIds) &&
+        cityIds.length > 0 &&
+        (!averageCheckPerCity || averageCheckPerCity.length === 0)
+      ) {
         const averageCheckArray = cityIds.map((cityId) => ({
           cityId,
           averageCheck: 1000,
@@ -148,11 +153,47 @@ async function updateAverageCheckForAllParks() {
   }
 }
 
+async function createAdmin() {
+  const secretKey = Buffer.from("12345678901234567890123456789012", "utf-8"); // 32 байта
+  const iv = Buffer.from("1234567890123456", "utf-8"); // 16 байт IV
+
+  function pkcs7Pad(text) {
+    const blockSize = 16;
+    const pad = blockSize - (text.length % blockSize);
+    return text + String.fromCharCode(pad).repeat(pad);
+  }
+
+  function pkcs7Unpad(text) {
+    const pad = text.charCodeAt(text.length - 1);
+    return text.slice(0, -pad);
+  }
+
+  function encryptPassword(password) {
+    const cipher = crypto.createCipheriv("aes-256-cbc", secretKey, iv);
+    let encrypted = cipher.update(pkcs7Pad(password), "utf8", "hex");
+    encrypted += cipher.final("hex");
+    return encrypted;
+  }
+
+  try {
+    await User.bulkCreate({
+      userName: "super_admin",
+      name: "Adil",
+      roles: ["admin", "manager"],
+      password: encryptPassword("adiladil"),
+    });
+
+    console.log("Все записи успешно обновлены!");
+  } catch (error) {
+    console.error("Ошибка при массовом обновлении averageCheckPerCity:", error);
+  }
+}
 
 async function seedDatabase() {
   await updateAverageCheckForAllParks();
   await seedStatuses();
   await seedStatusTransitions();
+  await createAdmin();
 }
 
 module.exports = seedDatabase;

@@ -1,14 +1,12 @@
 const express = require("express");
 const authController = require("../controllers/authContoller");
-
 const router = express.Router();
 
-router.get("/loginInstagram", authController.loginInstagram);
-router.get("/callback", authController.callback);
+router.post("/register", authController.register);
 router.post("/login", authController.login);
-router.post("/refresh-token", authController.refreshToken);
-router.post("/logout", authController.logout);
-router.post("/registration", authController.registration);
-router.post("/update-instagram-token", authController.updateInstagramToken);
+router.get("/profile", authController.getProfile);
+router.get("/getUsers", authController.getAllUsers);
+router.put("/update/:id", authController.updateUser);
+router.post("/reset-password/:id", authController.resetPassword);
 
 module.exports = router;
