@@ -3,6 +3,20 @@ const FormStatus = require("./models/FormStatus");
 const FormStatusTransition = require("./models/FormStatusTransition");
 const crypto = require("crypto");
 
+const SECRET_KEY = "12345678901234567890123456789012"; // 32 байта (AES-256)
+const IV = "1234567890123456"; // 16 байт (AES требует 16-байтовый IV)
+
+function encryptPassword(password) {
+  const cipher = crypto.createCipheriv(
+    "aes-256-cbc",
+    Buffer.from(SECRET_KEY, "utf-8"),
+    Buffer.from(IV, "utf-8")
+  );
+  let encrypted = cipher.update(password, "utf8", "base64"); // base64, чтобы передавать по сети
+  encrypted += cipher.final("base64");
+  return encrypted;
+}
+
 async function seedStatuses() {
   const statuses = [
     { code: "application_received", title: "Заявка поступила", isCommon: true },
@@ -154,38 +168,19 @@ async function updateAverageCheckForAllParks() {
 }
 
 async function createAdmin() {
-  const secretKey = Buffer.from("12345678901234567890123456789012", "utf-8"); // 32 байта
-  const iv = Buffer.from("1234567890123456", "utf-8"); // 16 байт IV
-
-  function pkcs7Pad(text) {
-    const blockSize = 16;
-    const pad = blockSize - (text.length % blockSize);
-    return text + String.fromCharCode(pad).repeat(pad);
-  }
-
-  function pkcs7Unpad(text) {
-    const pad = text.charCodeAt(text.length - 1);
-    return text.slice(0, -pad);
-  }
-
-  function encryptPassword(password) {
-    const cipher = crypto.createCipheriv("aes-256-cbc", secretKey, iv);
-    let encrypted = cipher.update(pkcs7Pad(password), "utf8", "hex");
-    encrypted += cipher.final("hex");
-    return encrypted;
-  }
-
   try {
-    await User.bulkCreate({
+    const encryptedPassword = encryptPassword("adiladil"); // Шифруем пароль перед сохранением
+
+    await User.create({
       userName: "super_admin",
       name: "Adil",
       roles: ["admin", "manager"],
-      password: encryptPassword("adiladil"),
+      password: encryptedPassword, // Сохраняем зашифрованный пароль
     });
 
-    console.log("Все записи успешно обновлены!");
+    console.log("✅ Админ создан с зашифрованным паролем:", encryptedPassword);
   } catch (error) {
-    console.error("Ошибка при массовом обновлении averageCheckPerCity:", error);
+    console.error("❌ Ошибка при создании админа:", error);
   }
 }
 
