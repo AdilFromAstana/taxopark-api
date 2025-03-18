@@ -3,32 +3,30 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../models");
 const crypto = require("crypto");
 
-const secretKey = Buffer.from("12345678901234567890123456789012", "utf-8"); // 32 байта
-const iv = Buffer.from("1234567890123456", "utf-8"); // 16 байт IV
-
-function pkcs7Pad(text) {
-  const blockSize = 16;
-  const pad = blockSize - (text.length % blockSize);
-  return text + String.fromCharCode(pad).repeat(pad);
-}
-
-function pkcs7Unpad(text) {
-  const pad = text.charCodeAt(text.length - 1);
-  return text.slice(0, -pad);
-}
+const SECRET_KEY = Buffer.from("12345678901234567890123456789012", "utf-8"); // 32 байта
+const IV = Buffer.from("1234567890123456", "utf-8"); // 16 байт IV
 
 function encryptPassword(password) {
-  const cipher = crypto.createCipheriv("aes-256-cbc", secretKey, iv);
-  let encrypted = cipher.update(pkcs7Pad(password), "utf8", "hex");
-  encrypted += cipher.final("hex");
+  const cipher = crypto.createCipheriv(
+    "aes-256-cbc",
+    Buffer.from(SECRET_KEY, "utf-8"),
+    Buffer.from(IV, "utf-8")
+  );
+  let encrypted = cipher.update(password, "utf8", "base64"); // base64, чтобы передавать по сети
+  encrypted += cipher.final("base64");
   return encrypted;
 }
 
 function decryptPassword(encryptedPassword) {
-  const decipher = crypto.createDecipheriv("aes-256-cbc", secretKey, iv);
-  let decrypted = decipher.update(encryptedPassword, "hex", "utf8");
-  decrypted += decipher.final("utf8");
-  return pkcs7Unpad(decrypted);
+  const decipher = crypto.createDecipheriv(
+    "aes-256-cbc",
+    Buffer.from(SECRET_KEY, "utf-8"),
+    Buffer.from(IV, "utf-8")
+  );
+
+  let decrypted = decipher.update(encryptedPassword, "base64", "utf8");
+  decrypted += decipher.final("utf8"); // Финальная обработка
+  return decrypted;
 }
 
 class AuthController {

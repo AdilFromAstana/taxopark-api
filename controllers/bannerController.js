@@ -128,12 +128,31 @@ class BannerController {
         return res.status(404).json({ message: "Баннер не найден." });
       }
 
-      banner.isActive = isActive; // Обновляем статус
+      banner.isActive = isActive;
       await banner.save();
 
       return res
         .status(200)
         .json({ message: "Статус баннера обновлен.", banner });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  }
+
+  async updateBanner(req, res) {
+    try {
+      const { id } = req.params;
+      const data = req.body;
+
+      const banner = await Banner.findByPk(id);
+      if (!banner) {
+        return res.status(404).json({ message: "Баннер не найден" });
+      }
+
+      // Обновить баннер новыми данными
+      await banner.update(data);
+
+      return res.status(200).json(banner);
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
@@ -152,6 +171,21 @@ class BannerController {
       return res.status(500).json({ message: error.message });
     }
   }
+
+  async updatePriorities(req, res) {
+      try {
+        const priorityData = req.body;
+  
+        if (!Array.isArray(priorityData) || priorityData.length === 0) {
+          return res.status(400).json({ message: "Некорректные данные" });
+        }
+  
+        const result = await bannerService.updatePriorities(priorityData);
+        return res.status(200).json(result);
+      } catch (error) {
+        return res.status(500).json({ message: error.message });
+      }
+    }
 }
 
 module.exports = new BannerController();
