@@ -11,6 +11,7 @@ const Banner = sequelize.define("Banner", {
   bannerUrl: { type: DataTypes.STRING, allowNull: false },
   title: { type: DataTypes.STRING, allowNull: false, defaultValue: "-" },
   link: { type: DataTypes.STRING, allowNull: true },
+  active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
 });
 
 module.exports = Banner;

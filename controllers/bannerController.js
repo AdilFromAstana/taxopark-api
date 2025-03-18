@@ -60,6 +60,7 @@ class BannerController {
     try {
       upload.single("file")(req, res, async (err) => {
         if (err) {
+          console.log("err: ", err);
           return res.status(400).json({ message: err.message });
         }
         if (!req.file) {
@@ -70,6 +71,8 @@ class BannerController {
 
         const newBanner = await Banner.create({
           bannerUrl: req.file.filename, // Сохраняем имя файла
+          title: req.body.title,
+          link: req.body.link,
         });
 
         return res.status(201).json(newBanner);

@@ -188,7 +188,7 @@ async function seedDatabase() {
   await updateAverageCheckForAllParks();
   await seedStatuses();
   await seedStatusTransitions();
-  await createAdmin();
+  // await createAdmin();
 }
 
 module.exports = seedDatabase;
