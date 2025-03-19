@@ -7,8 +7,8 @@ const { sendEmail } = require("./emailService");
 
 const generateOTP = () => Math.floor(1000 + Math.random() * 9000).toString();
 const SMS_API_URL = "http://kazinfoteh.org:9507/api?action=sendmessage";
-const SMS_USERNAME = "vsetaxi12"; // vsetaxi1
-const SMS_PASSWORD = "outO9JHNE1"; //outO9JHNE
+const SMS_USERNAME = "vsetaxi1"; // vsetaxi1
+const SMS_PASSWORD = "outO9JHNE"; //outO9JHNE
 const SMS_ORIGINATOR = "KiT_Notify";
 const REPORT_URL = "https://vashserver.kz/sms";
 
@@ -41,7 +41,7 @@ class SmsService {
       `&recipient=${phoneNumber}` +
       `&messagetype=SMS:TEXT` +
       `&originator=${SMS_ORIGINATOR}` +
-      `&messagedata=Ваш код: ${otpCode}` +
+      `&messagedata=Ваш код подтверждения: ${otpCode}.%0AНикому не сообщайте!%0Ahttps://vsetaxoparki.kz/` +
       `&reporturl=${REPORT_URL}?formId=${formId}&phone=${phoneNumber}`;
 
     const requestOptions = {
@@ -50,9 +50,9 @@ class SmsService {
     };
 
     try {
-      // const response = await fetch(smsUrl, requestOptions);
-      // const result = await response.text();
-      const result = "<statuscode>0</statuscode>";
+      const response = await fetch(smsUrl, requestOptions);
+      const result = await response.text();
+      // const result = "<statuscode>0</statuscode>";
 
       console.log("SMS API Response:", result);
 
