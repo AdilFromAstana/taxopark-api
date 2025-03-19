@@ -31,9 +31,7 @@ class BannerService {
 
   async deleteBanner(bannerId) {
     try {
-      console.log("bannerId: ", bannerId);
       const banner = await Banner.findOne({ where: { bannerUrl: bannerId } });
-      console.log("banner: ", banner);
       if (!banner || !banner.bannerUrl) {
         throw new Error(`Изображение не найдено`);
       }

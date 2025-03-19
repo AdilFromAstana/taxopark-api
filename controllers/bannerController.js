@@ -149,7 +149,6 @@ class BannerController {
         return res.status(404).json({ message: "Баннер не найден" });
       }
 
-      // Обновить баннер новыми данными
       await banner.update(data);
 
       return res.status(200).json(banner);

@@ -1,3 +1,4 @@
+const { City } = require("../models");
 const cityService = require("../services/cityService");
 
 class CityController {
@@ -28,7 +29,21 @@ class CityController {
 
   async getAllCities(req, res) {
     try {
-      const cities = await cityService.getAllCities();
+      const limit = req.query.limit;
+      const page = req.query.page;
+      const title = req.query.title;
+      const active = req.query.active;
+      const sortOrder = req.query.sortOrder;
+      const sortField = req.query.sortField;
+
+      const cities = await cityService.getAllCities({
+        limit,
+        page,
+        active,
+        title,
+        sortField,
+        sortOrder,
+      });
       return res.status(200).json(cities);
     } catch (error) {
       return res.status(500).json({ message: error.message });
@@ -38,13 +53,9 @@ class CityController {
   async updateCity(req, res) {
     try {
       const { id } = req.params;
-      const { title } = req.body;
-      if (!title) {
-        return res
-          .status(400)
-          .json({ message: "Название города обязательно." });
-      }
-      const city = await cityService.updateCity(id, title);
+      const data = req.body;
+
+      const city = await cityService.updateCity(id, data);
       return res.status(200).json(city);
     } catch (error) {
       return res.status(500).json({ message: error.message });

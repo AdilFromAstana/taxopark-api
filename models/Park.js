@@ -52,14 +52,6 @@ const Park = sequelize.define("Park", {
     defaultValue: [],
   },
   title: { type: DataTypes.STRING, allowNull: false },
-  averageCheck: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 0,
-    validate: {
-      min: 0,
-    },
-  },
   carRentals: {
     type: DataTypes.BOOLEAN,
     allowNull: true,

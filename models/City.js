@@ -9,7 +9,7 @@ const City = sequelize.define("City", {
     allowNull: false,
   },
   title: { type: DataTypes.STRING, allowNull: false, unique: true },
-  averageCheck: { type: DataTypes.DECIMAL, allowNull: true },
+  active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
 });
 
 module.exports = City;

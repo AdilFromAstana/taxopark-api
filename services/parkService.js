@@ -96,7 +96,6 @@ class ParkService {
         };
       }
 
-      // Запрашиваем парки
       const { rows: data, count: total } = await Park.findAndCountAll({
         where,
         limit,
