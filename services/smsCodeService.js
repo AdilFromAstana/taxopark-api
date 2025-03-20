@@ -50,9 +50,9 @@ class SmsService {
     };
 
     try {
-      const response = await fetch(smsUrl, requestOptions);
-      const result = await response.text();
-      // const result = "<statuscode>0</statuscode>";
+      // const response = await fetch(smsUrl, requestOptions);
+      // const result = await response.text();
+      const result = "<statuscode>0</statuscode>";
 
       console.log("SMS API Response:", result);
 

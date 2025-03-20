@@ -14,10 +14,15 @@ const Review = require("./Review");
 Park.hasMany(Promotion, { foreignKey: "parkId" });
 Promotion.belongsTo(Park, { foreignKey: "parkId" });
 
-// Связь форм с парками
 Form.belongsTo(Park, { foreignKey: "parkId", targetKey: "id" });
 
-// История статусов форм
+Form.hasOne(FormStatus, {
+  foreignKey: "code",
+  sourceKey: "statusCode",
+  as: "status",
+});
+FormStatus.belongsTo(Form, { foreignKey: "code", targetKey: "statusCode" });
+
 FormStatusHistory.belongsTo(Form, { foreignKey: "formId", targetKey: "id" });
 FormStatusHistory.belongsTo(FormStatus, {
   foreignKey: "newStatusCode",

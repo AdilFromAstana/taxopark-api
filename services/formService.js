@@ -16,6 +16,29 @@ class FormService {
     }
 
     try {
+      const twelveHoursAgo = new Date();
+      twelveHoursAgo.setHours(twelveHoursAgo.getHours() - 12);
+
+      const whereCondition = {
+        phoneNumber,
+        formType,
+        createdAt: {
+          [Op.gte]: twelveHoursAgo,
+        },
+      };
+
+      if (formType === "taxiPark") {
+        whereCondition.parkId = parkId;
+      }
+
+      const existingForm = await Form.findOne({
+        where: whereCondition,
+      });
+
+      if (existingForm) {
+        throw new Error("Поле ");
+      }
+
       const form = await Form.create({
         name,
         parkId,
@@ -74,16 +97,14 @@ class FormService {
     if (!form) {
       throw new Error("Форма не найдена");
     }
-    console.log("form.formType: ", form.formType);
-    console.log("form.statusCode: ", form.statusCode);
     return await FormStatusTransition.findAll({
       where: {
         [Op.or]: [
-          { formType: form.formType }, // Совпадение formType
-          { formType: null }, // Совпадение formType
-          { isCommon: { [Op.is]: true } }, // Все, где isCommon = true, независимо от formType
+          { formType: form.formType },
+          { formType: null },
+          { isCommon: { [Op.is]: true } },
         ],
-        fromStatus: form.statusCode, // Фильтр по fromStatus
+        fromStatus: form.statusCode,
       },
       include: [
         {
@@ -94,6 +115,14 @@ class FormService {
       ],
       attributes: ["toStatus", "requires_reason"],
     });
+  }
+
+  async getAllStatuses() {
+    const formStatuses = await FormStatus.findAll();
+    if (!formStatuses) {
+      throw new Error("Статусы не найдена");
+    }
+    return formStatuses;
   }
 
   async getAllForms({
@@ -107,6 +136,7 @@ class FormService {
     filterStartDate = "",
     filterEndDate = "",
     formType = "",
+    statusCode = null,
   }) {
     try {
       const offset = (page - 1) * limit;
@@ -127,15 +157,18 @@ class FormService {
       }
       if (filterName) {
         where.name = {
-          [Op.iLike]: `%${filterName}%`, // Регистронезависимый поиск с шаблоном
+          [Op.iLike]: `%${filterName}%`,
         };
       }
       if (formType) {
         where.formType = formType;
       }
+      if (statusCode) {
+        where.statusCode = statusCode;
+      }
       if (phoneNumber) {
         where.phoneNumber = {
-          [Op.iLike]: `%${phoneNumber}%`, // Регистронезависимый поиск с шаблоном
+          [Op.iLike]: `%${phoneNumber}%`,
         };
       }
       if (filterStartDate || filterEndDate) {
@@ -149,7 +182,14 @@ class FormService {
       }
 
       const { rows: data, count: total } = await Form.findAndCountAll({
-        include: [{ model: Park, as: "Park", attributes: ["title", "id"] }],
+        include: [
+          { model: Park, as: "Park", attributes: ["title", "id"] },
+          {
+            model: FormStatus,
+            attributes: ["code", "title"],
+            as: "status",
+          },
+        ],
         limit,
         offset,
         order,

@@ -54,6 +54,15 @@ class FormController {
     }
   }
 
+  async getAllStatuses(req, res) {
+    try {
+      const form = await formService.getAllStatuses();
+      return res.status(200).json(form);
+    } catch (error) {
+      return res.status(404).json({ message: error.message });
+    }
+  }
+
   async getAllForms(req, res) {
     try {
       const limit = req.query.limit;
@@ -62,6 +71,7 @@ class FormController {
       const sortField = req.query.sortField;
       const filterName = req.query.filterName;
       const phoneNumber = req.query.phoneNumber;
+      const statusCode = req.query.statusCode;
       const formType = req.query.formType;
       const filterStartDate = req.query.filterStartDate;
       const filterEndDate = req.query.filterEndDate;
@@ -78,6 +88,7 @@ class FormController {
         filterEndDate,
         phoneNumber,
         formType,
+        statusCode,
       });
       return res.status(200).json(forms);
     } catch (error) {
