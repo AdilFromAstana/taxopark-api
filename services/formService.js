@@ -36,7 +36,7 @@ class FormService {
       });
 
       if (existingForm) {
-        throw new Error("Поле ");
+        throw new Error("Дождитесь ответа менеджера");
       }
 
       const form = await Form.create({
@@ -52,8 +52,9 @@ class FormService {
         newStatusCode: "application_received",
       });
 
-      await smsCodeService.sendOtp(form.id, phoneNumber);
-      return form;
+      const sms = await smsCodeService.sendOtp(form.id, phoneNumber);
+      console.log(sms);
+      return { ...form.dataValues, smsCodeId: sms.smsCodeId };
     } catch (error) {
       throw new Error(`Ошибка при создании формы: ${error.message}`);
     }

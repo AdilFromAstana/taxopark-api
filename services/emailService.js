@@ -108,7 +108,6 @@ async function sendEmail({
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log("Email отправлен:", info.messageId);
     await FormStatusHistory.create({
       formId: formId,
       newStatusCode: "partner_notified",

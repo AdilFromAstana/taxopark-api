@@ -21,3 +21,14 @@ exports.verifyOtp = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+exports.resendOtp = async (req, res) => {
+  try {
+    const { smsCodeId } = req.body;
+    const response = await smsCodeService.resendOtp(smsCodeId);
+    res.json(response);
+  } catch (error) {
+    console.error("Ошибка при переотправки OTP:", error);
+    res.status(400).json({ message: error.message });
+  }
+};

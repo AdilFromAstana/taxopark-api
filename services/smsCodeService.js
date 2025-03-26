@@ -2,8 +2,9 @@ const SmsCode = require("../models/SmsCode");
 const Form = require("../models/Form");
 const { v4: uuidv4 } = require("uuid");
 const moment = require("moment");
-const { FormStatusHistory } = require("../models");
+const { FormStatusHistory, Park } = require("../models");
 const { sendEmail } = require("./emailService");
+const { Op } = require("sequelize");
 
 const generateOTP = () => Math.floor(1000 + Math.random() * 9000).toString();
 const SMS_API_URL = "http://kazinfoteh.org:9507/api?action=sendmessage";
@@ -50,17 +51,13 @@ class SmsService {
     };
 
     try {
-      // const response = await fetch(smsUrl, requestOptions);
-      // const result = await response.text();
-      const result = "<statuscode>0</statuscode>";
+      const response = await fetch(smsUrl, requestOptions);
+      const result = await response.text();
+      // const result = "<statuscode>0</statuscode>";
 
-      console.log("SMS API Response:", result);
-
-      // Проверяем, есть ли <statuscode>0</statuscode> в ответе (успех)
       if (result.includes("<statuscode>0</statuscode>")) {
-        const expiresAt = moment().add(1, "minute").toDate();
+        const expiresAt = moment().add(3, "minute").toDate();
 
-        // Создаем запись в базе только после успешной отправки
         const sms = await SmsCode.create({
           id: uuidv4(),
           formId,
@@ -73,7 +70,12 @@ class SmsService {
           newStatusCode: "sms_sent",
         });
 
-        return { success: true, message: "OTP отправлен", otpCode };
+        return {
+          success: true,
+          message: "OTP отправлен",
+          otpCode,
+          smsCodeId: sms.id,
+        };
       } else {
         await FormStatusHistory.create({
           formId: formId,
@@ -98,10 +100,15 @@ class SmsService {
     });
 
     if (!smsCode) {
-      throw new Error("Неверный или просроченный код");
+      throw new Error("Неверный код");
+    }
+
+    if (smsCode.expiresAt < new Date()) {
+      throw new Error("Срок действия кода истек");
     }
 
     const form = await Form.findByPk(formId);
+    const park = await Park.findByPk(form.parkId);
     form.statusCode = "sms_confirmed";
     await form.save();
     await smsCode.update({ isVerified: true });
@@ -109,16 +116,57 @@ class SmsService {
       formId: formId,
       newStatusCode: "sms_confirmed",
     });
-    await sendEmail({
-      formId: formId,
-      to: form.email || "adilfirstus@gmail.com",
-      name: form.name,
-      site: process.env.CLIENT_URL,
-      createdAt: moment(form.createdAt).format("DD.MM.YYYY HH:mm"),
-      phoneNumber: this.formatPhoneNumber(form.phoneNumber),
-      additionalInfo: "",
-    });
+    if (park.email) {
+      await sendEmail({
+        formId: formId,
+        to: park.email || "adilfirstus@gmail.com",
+        name: form.name,
+        site: process.env.CLIENT_URL,
+        createdAt: moment(form.createdAt).format("DD.MM.YYYY HH:mm"),
+        phoneNumber: this.formatPhoneNumber(form.phoneNumber),
+        additionalInfo: "",
+      });
+    }
     return { message: "Заявка подтверждена!" };
+  }
+
+  async resendOtp(smsCodeId) {
+    const smsCode = await SmsCode.findByPk(smsCodeId);
+
+    if (!smsCode) {
+      throw new Error("Неверный или просроченный код");
+    }
+    const otpCode = generateOTP();
+
+    const smsUrl =
+      `${SMS_API_URL}&username=${SMS_USERNAME}&password=${SMS_PASSWORD}` +
+      `&recipient=${smsCode.phoneNumber}` +
+      `&messagetype=SMS:TEXT` +
+      `&originator=${SMS_ORIGINATOR}` +
+      `&messagedata=Ваш код подтверждения: ${otpCode}.%0AНикому не сообщайте!%0Ahttps://vsetaxoparki.kz/` +
+      `&reporturl=${REPORT_URL}?formId=${smsCode.formId}&phone=${smsCode.phoneNumber}`;
+
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+    try {
+      const response = await fetch(smsUrl, requestOptions);
+      const result = await response.text();
+      // const result = "<statuscode>0</statuscode>";
+      if (result.includes("<statuscode>0</statuscode>")) {
+        smsCode.otpCode = otpCode;
+        smsCode.expiresAt = moment().add(3, "minute").toDate();
+        await smsCode.save();
+        console.log("smsCode: ", smsCode);
+        return { message: "Отправлен новый код!" };
+      } else {
+        throw new Error("Ошибка переотправки SMS: некорректный ответ API");
+      }
+    } catch (error) {
+      console.error("Ошибка при переотправке SMS:", error);
+      throw new Error("Ошибка переотправки SMS");
+    }
   }
 }
 
