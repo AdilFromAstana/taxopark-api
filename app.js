@@ -20,6 +20,7 @@ const reviewRoutes = require("./routes/reviewRoutes");
 const bannerRoutes = require("./routes/bannerRoutes");
 const smsCodeRouter = require("./routes/smsCodeRouter");
 const promotionRoutes = require("./routes/promotionRoutes");
+const commissionRoutes = require("./routes/commissionRoutes");
 
 app.use("/users", authRoutes);
 app.use("/reviews", reviewRoutes);
@@ -29,5 +30,6 @@ app.use("/promotions", promotionRoutes);
 app.use("/forms", formRoutes);
 app.use("/parks", parkRoutes);
 app.use("/smsCodes", smsCodeRouter);
+app.use("/commissions", commissionRoutes);
 
 module.exports = app;

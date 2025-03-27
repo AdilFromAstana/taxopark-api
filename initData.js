@@ -1,6 +1,10 @@
-const { Park, User } = require("./models");
-const FormStatus = require("./models/FormStatus");
-const FormStatusTransition = require("./models/FormStatusTransition");
+const {
+  Park,
+  User,
+  Commission,
+  FormStatus,
+  FormStatusTransition,
+} = require("./models");
 const crypto = require("crypto");
 
 const SECRET_KEY = "12345678901234567890123456789012"; // 32 байта (AES-256)
@@ -15,6 +19,12 @@ function encryptPassword(password) {
   let encrypted = cipher.update(password, "utf8", "base64"); // base64, чтобы передавать по сети
   encrypted += cipher.final("base64");
   return encrypted;
+}
+
+async function yandexCommission() {
+  await Commission.findOrCreate({
+    where: { code: "yandex", title: "Яндекс.Такси", sum: 2000 },
+  });
 }
 
 async function seedStatuses() {
@@ -188,6 +198,7 @@ async function seedDatabase() {
   await updateAverageCheckForAllParks();
   await seedStatuses();
   await seedStatusTransitions();
+  await yandexCommission();
   // await createAdmin();
 }
 

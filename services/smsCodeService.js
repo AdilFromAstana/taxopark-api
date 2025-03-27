@@ -143,7 +143,7 @@ class SmsService {
       `&recipient=${smsCode.phoneNumber}` +
       `&messagetype=SMS:TEXT` +
       `&originator=${SMS_ORIGINATOR}` +
-      `&messagedata=Ваш код подтверждения: ${otpCode}.%0AНикому не сообщайте!%0Ahttps://vsetaxoparki.kz/` +
+      `&messagedata=Ваш код: ${otpCode}.%0AНикому не сообщайте!%0Ahttps://vsetaxoparki.kz/` +
       `&reporturl=${REPORT_URL}?formId=${smsCode.formId}&phone=${smsCode.phoneNumber}`;
 
     const requestOptions = {
@@ -151,9 +151,9 @@ class SmsService {
       redirect: "follow",
     };
     try {
-      const response = await fetch(smsUrl, requestOptions);
-      const result = await response.text();
-      // const result = "<statuscode>0</statuscode>";
+      // const response = await fetch(smsUrl, requestOptions);
+      // const result = await response.text();
+      const result = "<statuscode>0</statuscode>";
       if (result.includes("<statuscode>0</statuscode>")) {
         smsCode.otpCode = otpCode;
         smsCode.expiresAt = moment().add(3, "minute").toDate();

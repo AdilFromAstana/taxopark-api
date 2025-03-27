@@ -16,29 +16,6 @@ class FormService {
     }
 
     try {
-      const twelveHoursAgo = new Date();
-      twelveHoursAgo.setHours(twelveHoursAgo.getHours() - 12);
-
-      const whereCondition = {
-        phoneNumber,
-        formType,
-        createdAt: {
-          [Op.gte]: twelveHoursAgo,
-        },
-      };
-
-      if (formType === "taxiPark") {
-        whereCondition.parkId = parkId;
-      }
-
-      const existingForm = await Form.findOne({
-        where: whereCondition,
-      });
-
-      if (existingForm) {
-        throw new Error("Дождитесь ответа менеджера");
-      }
-
       const form = await Form.create({
         name,
         parkId,
