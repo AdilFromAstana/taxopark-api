@@ -22,9 +22,15 @@ function encryptPassword(password) {
 }
 
 async function yandexCommission() {
-  await Commission.findOrCreate({
-    where: { code: "yandex", title: "Яндекс.Такси", sum: 2000 },
-  });
+  const existing = await Commission.findOne({ where: { code: "yandex" } });
+  if (!existing) {
+    return await Commission.create({
+      code: "yandex",
+      title: "Яндекс.Такси",
+      sum: 2000
+    });
+  }
+  return existing;
 }
 
 async function seedStatuses() {
